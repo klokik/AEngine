@@ -20,8 +20,6 @@
 class AEObject
 {
 protected:
-	std::string name;
-
 	AEObject *_parent;
 
 	std::vector<AEObject*> _children;
@@ -56,6 +54,8 @@ protected:
 	AEBoundingSphere _bounding_sphere;
 
 public:
+	std::string name;
+	
 	int projection;	//either AE_ORTHOGRAPHIC or AE_PERSPECTIVE
 
 	bool visible;

@@ -34,6 +34,8 @@ public:
 
 	void AddObject(AEObject *obj);
 
+	AEObject *GetObject(std::string name);
+
 	virtual ~AEScene(void);
 };
 
