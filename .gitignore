@@ -7,7 +7,8 @@
 *.dae
 *~
 ~*
-*.cmake
+cmake_install.cmake
+# *.cmake
 
 /resource/
 /AUTHORS
@@ -18,11 +19,11 @@
 /AUTHORS
 
 build/
-bin/
+bin/*
 Tests/
 
 ChangeLog
-CMakeLists.txt
+# CMakeLists.txt
 CMakeCache.txt
 CMakeFiles
 Makefile
