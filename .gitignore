@@ -27,3 +27,5 @@ ChangeLog
 CMakeCache.txt
 CMakeFiles
 Makefile
+
+*.sublime-*
