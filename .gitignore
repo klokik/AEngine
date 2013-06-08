@@ -20,7 +20,7 @@ cmake_install.cmake
 
 build/
 bin/*
-Tests/
+# Tests/
 
 ChangeLog
 # CMakeLists.txt
