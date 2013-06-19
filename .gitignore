@@ -10,7 +10,8 @@
 cmake_install.cmake
 # *.cmake
 
-/resource/
+/resource/*
+!/resource/shader/
 /AUTHORS
 /COPYING
 /INSTALL
