@@ -7,6 +7,9 @@
 #include "AEObjectEmpty.h"
 #include "AEObjectCamera.h"
 #include "AEVectorMath.h"
+#include "AEObjectText.h"
+
+#include "graph.hpp"
 
 void LoadObjFile(AEMesh *&mesh, const char *path);
 
@@ -15,29 +18,7 @@ namespace Zombie
 	using namespace std;
 	using namespace aengine;
 
-	class Mob;
 	class ZombieWorld;
-
-	class Item
-	{
-	public:
-		enum ItemType {WEAPON,FOOD,TOOL};
-		enum ItemState {ACTIVE=1,INACTIVE=2,BROKEN=4};
-
-		ItemType item_type;
-		ItemState state;
-
-		string name;
-		float value;
-		float health;
-
-
-		void apply(Mob &mob);
-
-		void activate();
-		void deactivate();
-		void repair();
-	};
 
 	class Mob: public AEObjectMesh
 	{
@@ -62,6 +43,8 @@ namespace Zombie
 		float water;
 		float motivation;
 
+		ZombieWorld *world;
+
 		vector<Item> inventory;
 
 		enum Target {POINT,MOB,NO_TARGET};
@@ -76,11 +59,7 @@ namespace Zombie
 			targ_mob = NULL;
 			targ_type = NO_TARGET;
 		}
-		void run(float power)
-		{
-			float delta=0.1f;
-			Move(vec3f(0,0,-power*delta));
-		}
+		void run(float power);
 		void attack();
 		void jump(float power)
 		{
@@ -134,12 +113,14 @@ namespace Zombie
 		void update(ZombieWorld &world);
 	};
 
-	class Chunk
+	class Chunk: public AEObjectEmpty
 	{
 	public:
 		int id;
 		vector<Mob*> mobs;
 		int X,Y;
+
+		Graph graph;
 
 		void update(float ms)
 		{
@@ -158,7 +139,7 @@ namespace Zombie
 	class ZombieWorld
 	{
 	public:
-		vector<Chunk> chunks;
+		vector<Chunk*> chunks;
 
 		vector<Mob*> mobs;
 
@@ -173,6 +154,7 @@ namespace Zombie
 		AEEngine engine;
 
 		AEObjectMesh *chunk_mesh;
+		AEObjectText *otext;
 
 		// ------------------------ Life cycle -------------------------
 		void generate(int seed,string name)
@@ -226,6 +208,8 @@ namespace Zombie
 		{
 			debugMsg("Engine started");
 
+			engine.scene->fonts.LoadFont("../resource/font1.png","font1",16,16);
+
 			AEObjectCamera *camera = new AEObjectCamera;
 
 			cam_offset = vec3f(0.0f,50.0f,25.0f);
@@ -246,15 +230,21 @@ namespace Zombie
 
 			player = createMob(Mob::PLAYER,vec3f(0.0f,0.0f,0.5f));
 
-			for(int q=0;q<10;q++)
-			{
-				Mob *mob = createMob(Mob::ZOMBIE,vec3f(q-5,0.1f,20.0f));
-				mob->motivation = 0.1f*(q+1);
-				engine.scene->AddObject(mob);
-			}
+			// for(int q=0;q<10;q++)
+			// {
+			// 	Mob *mob = createMob(Mob::ZOMBIE,vec3f(q-5,0.1f,20.0f));
+			// 	mob->motivation = 0.1f*(q+1);
+			// 	engine.scene->AddObject(mob);
+			// }
 
 			engine.scene->AddObject(this->player);
 			engine.scene->AddObject(chunk_mesh);
+
+			otext = new AEObjectText;
+			otext->alignment = AE_LEFT;
+			otext->text = "OMG";
+			otext->SetTranslate(vec3f(25.0f,25.0f,0.0f));
+			engine.scene->AddObject(otext);
 
 			engine.render->CacheScene(engine.scene);
 		}
@@ -279,33 +269,52 @@ namespace Zombie
 			for(size_t q=0;q<mobs.size();q++)
 				mobs[q]->update(*this);
 
-			getChunk(vec2f(player->translate.X,player->translate.Z)).update(ms);
+			getChunk(vec2f(player->translate.X,player->translate.Z))->update(ms);
 
+			otext->text = "";
+			for(size_t q=0;q<player->inventory.size();q++)
+			{
+				Item item = player->inventory[q];
+				otext->text+=item.name + ":" + std::to_string(item.amount) + " ";
+			}
 		}
 
-		Chunk &getChunk(int x,int y)
+		Chunk *getChunk(int x,int y)
 		{
+			int nx = nearbyint(x/100.0f)*100;
+			int ny = nearbyint(y/100.0f)*100;
 			for(auto chunk:chunks)
 			{
-				if(chunk.X==x&&chunk.Y==y)
+				if(chunk->X==nx&&chunk->Y==ny)
 					return chunk;
 			}
 
-			loadChunk(x,y);
+			loadChunk(nx,ny);
 
-			return getChunk(x,y);
+			return getChunk(nx,ny);
 		}
 
-		Chunk &getChunk(Vec2f pos)
+		Chunk *getChunk(Vec2f pos)
 		{
 			return getChunk((int)floor(pos.X),(int)floor(pos.Y));
 		}
 
 		void generateChunk(int x,int y)
 		{
-			Chunk chunk;
-			chunk.X = x;
-			chunk.Y = y;
+			Chunk *chunk = new Chunk;
+			chunk->X = x;
+			chunk->Y = y;
+
+			chunk->graph.loadFromFile("../resource/graph.txt");
+
+			AEObjectMesh *obj_mesh = new AEObjectMesh;
+			obj_mesh->mesh = chunk_mesh->mesh;
+			obj_mesh->material = chunk_mesh->material;
+
+			chunk->AddChild(obj_mesh);
+
+			chunk->SetTranslate(vec3f(x,0.0f,y));
+			engine.scene->AddObject(chunk);
 
 			chunks.push_back(chunk);
 		}
@@ -363,6 +372,14 @@ namespace Zombie
 		mob->mob_type = type;
 		mob->mob_state = Mob::ACTIVE;
 
+		Item item;
+		item.name = "Bread";
+		item.amount = 2;
+		mob->inventory.push_back(item);
+		item.name = "Pepsi";
+		item.amount = 3;
+		mob->inventory.push_back(item);
+
 		// Set appropriate appearence
 		switch(type)
 		{
@@ -381,24 +398,44 @@ namespace Zombie
 		return mob;
 	}
 
-	void Mob::update(ZombieWorld &world)
+	void Mob::update(ZombieWorld &_world)
 	{
+		this->world = &_world;
 		if(mob_type==PLAYER)
 		{
 			if(
-				world.engine.GetKeyState('w')||
-				world.engine.GetKeyState('s')||
-				world.engine.GetKeyState('a')||
-				world.engine.GetKeyState('d'))
+				_world.engine.GetKeyState('w')||
+				_world.engine.GetKeyState('s')||
+				_world.engine.GetKeyState('a')||
+				_world.engine.GetKeyState('d'))
 					run(2.0f);
 		}
 
 		if(mob_type==ZOMBIE)
 		{
-			setTarget(*world.player);
+			setTarget(*_world.player);
 			orient();
 			run(motivation);
 		}
+	}
+
+	void Mob::run(float power)
+	{
+		float delta=0.1f;
+		Move(vec3f(0,0,-power*delta));
+
+		Chunk *chunk = world->getChunk(translate.X,translate.Z);
+		Graph::TestResult result;
+		result = chunk->graph.test(translate,vec3f(chunk->X,0,chunk->Y));
+
+		if(result.passed)
+		{
+			//set altitude
+			_translate.Y = result.altitude;		//FIXME: bug
+			InvalidateTranslate();
+		}
+		else
+			Move(vec3f(0,0,power*delta)); //move back
 	}
 
 	void startInit(int *param)
