@@ -288,7 +288,8 @@ void AESDLWindow::CallEvent(unsigned int a_event,int param[5])
 
 AESDLWindow::~AESDLWindow(void)
 {
-	SDL_FreeSurface(this->screen);
+	// For some reason this often causes error
+	// SDL_FreeSurface(this->screen);
 	SDL_Quit();
 }
 
