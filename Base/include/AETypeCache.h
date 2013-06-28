@@ -13,6 +13,7 @@
 #include "AEObject.h"
 #include "AEObjectSprite.h"
 #include "AEObjectJoint.h"
+#include "AEObjectText.h"
 
 namespace aengine
 {
@@ -23,8 +24,11 @@ namespace aengine
 		std::vector<AEObject*> empties;
 		std::vector<AEObjectJoint*> joints;
 
+
 		std::vector<AEObjectSprite*> sprites_persp;
 		std::vector<AEObjectSprite*> sprites_ortho;
+
+		std::vector<AEObjectText*> texts;
 
 		void Clear(void)
 		{
@@ -33,6 +37,7 @@ namespace aengine
 			joints.clear();
 			sprites_persp.clear();
 			sprites_ortho.clear();
+			texts.clear();
 		}
 	};
 }

@@ -89,6 +89,7 @@ protected:
 	virtual void RenderMeshes(void);
 	virtual void RenderEmpties(void);
 	virtual void RenderJoints(void);
+	virtual void RenderTexts(void);
 
 	///returns "true" if object is textured, and "false" in the other case
 	virtual bool ApplyMaterial(AEMaterial *mat);

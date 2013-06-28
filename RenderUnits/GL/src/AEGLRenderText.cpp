@@ -80,3 +80,11 @@ void AEGLRenderUnit::RenderText(AEObjectText *obj)
 	if(obj->projection==AE_ORTHOGRAPHIC)
 		this->PopMode();
 }
+
+void AEGLRenderUnit::RenderTexts(void)
+{
+	for(size_t q=0;q<type_cache.texts.size();q++)
+	{
+		RenderText(type_cache.texts[q]);
+	}
+}

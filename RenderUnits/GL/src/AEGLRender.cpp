@@ -109,6 +109,7 @@ void AEGLRenderUnit::QueueObject(AEObject * obj)
 		break;
 	case AE_OBJ_TEXT:
 		//this->RenderText(dynamic_cast<AEObjectText*>(obj));
+		this->type_cache.texts.push_back(dynamic_cast<AEObjectText*>(obj));
 		break;
 	case AE_OBJ_JOINT:
 		//this->RenderJoint(dynamic_cast<AEObjectJoint*>(obj));
@@ -179,6 +180,8 @@ void AEGLRenderUnit::Render(AEObjectCamera *camera)
 
 	this->RenderSpritesPersp();
 	this->RenderSpritesOrtho();
+
+	this->RenderTexts();
 }
 
 void AEGLRenderUnit::Set2DMode(void)
