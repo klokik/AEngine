@@ -450,7 +450,7 @@ int AECOLLADALoader::processInput(AEMesh *mesh,daeElement *input,
 	std::stringstream fstr(efarray->getCharData());
 	std::cout<<"count: "<<*unit_count<<std::endl;
 
-	*units=(AEVector3f*)malloc(sizeof(unit_size)*(*unit_count));
+	*units=(AEVector3f*)malloc(unit_size*(*unit_count));
 
 	for(size_t e=0;e<*unit_count;e++)
 		fstr>>(*units)[e].X>>(*units)[e].Y>>(*units)[e].Z;
