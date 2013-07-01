@@ -14,6 +14,10 @@ include(aengine2.cmake)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
+
 #we use this variable to add different include pathes thoughout project
 set(INCLUDES "Tests" CACHE INTERNAL "include directories" FORCE)
 # same with libraries that would be linked with executable/to shared library
@@ -40,10 +44,18 @@ add_subdirectory(Plugins)
 # 	message("lib: " ${lib})
 # endforeach() 
 
-add_executable(ae_test ${PROJECT_SOURCE_DIR}/Tests/skel_test.cpp ${SOURCE_FILES})
-target_link_libraries(ae_test ${LINK_LIBRARIES} ${ADDITIONAL_LIBRARIES})
+add_library(aengine ${SOURCE_FILES})
+target_link_libraries(aengine ${LINK_LIBRARIES} ${ADDITIONAL_LIBRARIES})
+add_executable(ae_test ${PROJECT_SOURCE_DIR}/Tests/skel_test.cpp)
+target_link_libraries(ae_test aengine)
 
 # Zombie World
 
-include_directories(Tests/ZombieWorld)
-add_subdirectory(Tests/ZombieWorld)
+include_directories(Project/ZombieWorld)
+add_subdirectory(Project/ZombieWorld)
+
+# Heaven
+
+include_directories(Project/Heaven)
+add_subdirectory(Project/Heaven)
+
