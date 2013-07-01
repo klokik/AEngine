@@ -1,7 +1,7 @@
 /*
  * main.cpp
  *
- *  Created on: Aug 19, 2011
+ *  Created on: June, 2013
  *      Author: klokik
  */
 
@@ -22,6 +22,8 @@
 #include "AEObjectText.h"
 
 #include "AECOLLADALoader.h"
+
+using namespace aengine;
 
 //#include "AEMatrix4f4.h"
 
@@ -185,7 +187,7 @@ void StartInit(int *)
 //	engine.scene->AddObject(otext);
 
 	AECOLLADALoader loader;
-	loader.Load(engine.scene,"../resource/sintel.dae");
+	loader.Load(engine.scene,"/home/klokik/Dev/Zombie/resources/models/world.dae");
 
 	engine.render->CacheScene(engine.scene);
 
@@ -228,7 +230,7 @@ void MouseMove(int *param)
 	if(((int*)param)[4]>0)
 	{
 		float sensetivity=0.05f;
-		engine.curCamera->RelRotate(vec3f(-((int*)param)[3]*sensetivity,((int*)param)[2]*sensetivity,0));
+		engine.curCamera->RelRotate(vec3f(((int*)param)[3]*sensetivity,((int*)param)[2]*sensetivity,0));
 		engine.window->CenterCursor();
 	}
 
