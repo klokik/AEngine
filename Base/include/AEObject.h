@@ -74,7 +74,7 @@ public:
 	AEObject(void);
 
 	void AddChild(AEObject* child);
-	void RemChild(AEObject* child);
+	void RemoveChild(AEObject* child);
 
 	virtual void Move(AEVector3f vec);
 

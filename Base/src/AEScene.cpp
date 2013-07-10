@@ -24,6 +24,11 @@ void AEScene::AddObject(AEObject *obj)
 //		this->lights.push_back((AEObjectLight*)obj);
 }
 
+void AEScene::RemoveObject(AEObject *obj)
+{
+	this->objects.remove(obj);
+}
+
 AEObject *AEScene::GetObject(std::string name)
 {
 	for(auto object:objects)
