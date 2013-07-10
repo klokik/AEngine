@@ -50,7 +50,7 @@ void AEObject::AddChild(AEObject *child)
 	this->_children.push_back(child);
 }
 
-void AEObject::RemChild(AEObject *child)
+void AEObject::RemoveChild(AEObject *child)
 {
 	std::vector<AEObject*>::iterator b=this->_children.begin();
 	std::vector<AEObject*>::iterator e=this->_children.end();
@@ -59,6 +59,8 @@ void AEObject::RemChild(AEObject *child)
 		if(*b==child)
 		{
 			child->_parent=NULL;
+			//FIXME: we must either destroy this object or move to scene
+			throw 0;
 			this->_children.erase(b);
 			break;
 		}

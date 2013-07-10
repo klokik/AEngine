@@ -33,6 +33,7 @@ public:
 	AEScene(void);
 
 	void AddObject(AEObject *obj);
+	void RemoveObject(AEObject *obj);
 
 	AEObject *GetObject(std::string name);
 

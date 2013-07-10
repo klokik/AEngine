@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "AEScene.h"
 #include "AEDefines.h"
@@ -22,6 +23,11 @@ void AEScene::AddObject(AEObject *obj)
 
 //	if(obj->GetType()==AE_OBJ_LIGHT)
 //		this->lights.push_back((AEObjectLight*)obj);
+}
+
+void AEScene::RemoveObject(AEObject *obj)
+{
+	this->objects.erase(std::remove(objects.begin(),objects.end(),obj),objects.end());
 }
 
 AEObject *AEScene::GetObject(std::string name)
