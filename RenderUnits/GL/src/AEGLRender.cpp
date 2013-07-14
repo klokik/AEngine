@@ -100,6 +100,9 @@ void AEGLRenderUnit::QueueObject(AEObject * obj)
 	case AE_OBJ_MESH:
 		//this->RenderMesh(dynamic_cast<AEObjectMesh*>(obj));
 		this->type_cache.meshes.push_back(obj);
+		// check if mesh is cached
+		if((dynamic_cast<AEObjectMesh*>(obj))->mesh&&!(dynamic_cast<AEObjectMesh*>(obj))->mesh->cached)
+			CacheObject(obj);
 		break;
 	case AE_OBJ_SPRITE:
 		if(obj->projection==AE_ORTHOGRAPHIC)
