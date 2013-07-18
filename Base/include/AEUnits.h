@@ -40,9 +40,16 @@ typedef AEVector4f Vec4f;
 
 typedef struct
 {
-	float U;
-	float V;
-	float W;
+	union
+	{
+		struct
+		{
+			float U;
+			float V;
+			float W;
+		};
+		AEVector3f vec;
+	};
 }AETexCoord;
 
 typedef struct
@@ -54,10 +61,17 @@ typedef struct
 
 typedef struct
 {
-	float R;
-	float G;
-	float B;
-	float A;
+	union
+	{
+		struct
+		{
+			float R;
+			float G;
+			float B;
+			float A;
+		};
+		AEVector4f vec;
+	};
 }AEColor;
 
 #endif /* AEUNITS_H_ */
