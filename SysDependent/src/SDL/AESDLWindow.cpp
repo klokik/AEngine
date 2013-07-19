@@ -112,9 +112,9 @@ void *AESDLWindow::WndProc(void* wparam)
 
 			case SDL_MOUSEMOTION:
 				param[0]=event.motion.x;
-				param[1]=event.motion.y;
-				param[2]=param[0]-(this->width>>1);
-				param[3]=param[1]-(this->height>>1);
+				param[1]=this->height-event.motion.y;
+				param[2]=event.motion.xrel;
+				param[3]=-event.motion.yrel;
 				param[4]=event.motion.state;
 
 				a_event=AE_EVENT_MOUSEMOVE;
@@ -122,7 +122,7 @@ void *AESDLWindow::WndProc(void* wparam)
 
 			case SDL_MOUSEBUTTONDOWN:
 				param[0]=event.button.x;
-				param[1]=event.button.y;
+				param[1]=this->height-event.button.y;
 				param[2]=event.button.button;
 
 				a_event=AE_EVENT_MOUSEDOWN;
@@ -130,7 +130,7 @@ void *AESDLWindow::WndProc(void* wparam)
 
 			case SDL_MOUSEBUTTONUP:
 				param[0]=event.button.x;
-				param[1]=event.button.y;
+				param[1]=this->height-event.button.y;
 				param[2]=event.button.button;
 
 				a_event=AE_EVENT_MOUSEUP;
