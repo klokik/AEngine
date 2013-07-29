@@ -57,4 +57,10 @@ AEVector2f operator-(const AEVector2f &a);
 AEVector3f operator-(const AEVector3f &a);
 AEVector4f operator-(const AEVector4f &a);
 
+template <typename T>
+T normalize(const T &a)
+{
+	return a/Length(a);
+}
+
 #endif /* AEVECTORMATH_H_ */
