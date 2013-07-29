@@ -11,67 +11,34 @@
 #include <SDL/SDL.h>
 
 #include "AEDefines.h"
-//#include "AEEngine.h"
+#include "AEWindow.h"
 
 
-//TODO make window separate abstract class to make possible use different window systems
-class AESDLWindow
+namespace aengine
 {
-	friend void *RunWndProc(void* param);
+	class AESDLWindow: public AEWindow
+	{
+	protected:
+		int vidFlags;
+		const SDL_VideoInfo *vidInfo;
+		SDL_Event event;
+		SDL_Surface *screen;
 
-protected:
-	uint16_t width;
-	uint16_t height;
-	uint16_t bpp;
+		virtual void *WndProc(void *param) override;
 
-	bool done;
-	bool active;
+	public:
 
-	int vidFlags;
-	const SDL_VideoInfo *vidInfo;
-	SDL_Event event;
-	SDL_Surface *screen;
+		AESDLWindow(void *engine=nullptr);
 
-	void *i_engine;
-	bool call_engine_events;
+		virtual int InitWindow(uint16_t _width,uint16_t _height,uint8_t _bpp,AE_WINDOW_TYPE _type);
 
-	AE_CALLBACK callback;
+		virtual void SetCursorPos(uint16_t x,uint16_t y) override;
+		virtual void CenterCursor(void) override;
 
-	unsigned long int thread;
+		virtual void SwapBuffers(void) override;
 
-	uint32_t _time;
-
-	void *WndProc(void *param);
-
-	void CallEvent(unsigned int a_event,int param[5]);
-
-public:
-	//try to use engine events instead of main events
-	//used in engine class
-
-	AE_EVENT OnClose;			//attributes {NULL}
-	AE_EVENT OnKeyDown;			//attributes {int keycode}
-	AE_EVENT OnKeyUp;			//attributes {int keycode}
-	AE_EVENT OnMouseDown;		//attributes {int x,y,mousekey}
-	AE_EVENT OnMouseMove;		//attributes {int x,y,deltaX,deltaY,keys}
-	AE_EVENT OnMouseUp;			//attributes {int x,y,mousekey}
-	AE_EVENT OnResize;			//attributes {int width,height}
-	AE_EVENT OnStart;			//attributes {NULL}
-
-	AESDLWindow(void *engine=NULL);
-
-	int InitWindow(uint16_t _width,uint16_t _height,uint8_t _bpp,AE_WINDOW_TYPE _type);
-
-	void Run(AE_CALLBACK _callback,bool async=false);
-	int Join(void);
-	void Stop(void);
-
-	void SetCursorPos(uint16_t x,uint16_t y);
-	void CenterCursor(void);
-
-	void SwapBuffers(void);
-
-	virtual ~AESDLWindow(void);
-};
+		virtual ~AESDLWindow(void);
+	};
+}
 
 #endif /* AESDLWINDOW_H_ */

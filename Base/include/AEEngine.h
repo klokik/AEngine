@@ -23,7 +23,7 @@ namespace aengine
 	public:
 		AEScene			*scene;
 		AERenderUnit	*render;
-		AESDLWindow		*window; //FIXME Use abstract window class
+		AEWindow		*window;
 
 		AEObjectCamera	*curCamera;
 

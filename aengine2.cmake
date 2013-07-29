@@ -9,3 +9,4 @@ add_definitions(-Wall)
 # set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} "-rdynamic")
 
 #set configuration header file for source code
+add_definitions(-DPLATFORM_xNIX)
