@@ -191,8 +191,6 @@ namespace aengine
 
 	AESDLWindow::~AESDLWindow(void)
 	{
-		// For some reason this often causes error
-		// SDL_FreeSurface(this->screen);
-		SDL_Quit();
+		done=true;
 	}
 }
