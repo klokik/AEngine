@@ -51,13 +51,13 @@ add_subdirectory(Plugins)
 
 add_library(aengine ${SOURCE_FILES})
 target_link_libraries(aengine ${LINK_LIBRARIES} ${ADDITIONAL_LIBRARIES})
-add_executable(ae_test ${PROJECT_SOURCE_DIR}/Tests/skel_test.cpp)
-target_link_libraries(ae_test aengine)
+# add_executable(ae_test ${PROJECT_SOURCE_DIR}/Tests/skel_test.cpp)
+# target_link_libraries(ae_test aengine)
 
 # Zombie World
 
-include_directories(Project/ZombieWorld)
-add_subdirectory(Project/ZombieWorld)
+# include_directories(Project/ZombieWorld)
+# add_subdirectory(Project/ZombieWorld)
 
 # Heaven
 

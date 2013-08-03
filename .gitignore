@@ -31,3 +31,15 @@ CMakeFiles
 Makefile
 
 *.sublime-*
+
+# Android project files
+.classpath
+.project
+.settings
+project.properties
+local.properties
+build.xml
+
+SysDependent/android/bin/
+SysDependent/android/gen/
+
