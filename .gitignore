@@ -39,6 +39,7 @@ Makefile
 project.properties
 local.properties
 build.xml
+proguard-project.txt
 
 SysDependent/android/bin/
 SysDependent/android/gen/
