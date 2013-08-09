@@ -3,9 +3,9 @@
 #if defined(PLATFORM_xNIX)||defined(PLATFORM_WINDOWS)
 	#include "SDL/AESDLWindow.h"
 #elif defined(PLATFORM_ANDROID)
-	#include "AEAndroidWindow.h"
+	#include "Android/AEAndroidWindow.h"
 #elif defined(PLATFORM_BLACKBERRY10)
-	#include "AECascadesWindow.h"
+	#include "BlackBerry/AECascadesWindow.h"
 #else
 	#error No target platform defined
 #endif

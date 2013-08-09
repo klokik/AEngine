@@ -14,10 +14,10 @@
 #include <android/sensor.h>
 #include <android/log.h>
 
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "AEngine", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "AEngine", __VA_ARGS__))
 
-#include "AEAndroidWindow.h"
+#include "Android/AEAndroidWindow.h"
 
 //future definition for app entry point
 int main(int argc,char **argv);
@@ -28,11 +28,13 @@ extern "C"
 	void android_main(struct android_app *state)
 	{
 		// check if glue was not stripped
-		app_dummy();
+		//app_dummy();
 
 		LOGI("App started");
 
-		main(1,(void*)state);
+		return;
+
+		main(1,(char**)&state);
 	}
 }
 
@@ -45,13 +47,17 @@ namespace aengine
 		context=EGL_NO_CONTEXT;
 		surface=EGL_NO_SURFACE;
 
-		android_app=nullptr;
+		a_app=nullptr;
 
 		LOGI("Window created");
 	}
 
 	void *AEAndroidWindow::WndProc(void* wparam)
 	{
+		struct android_app *state=static_cast<AEAndroidWindow*>(wparam)->a_app;
+
+		state->userData=wparam;
+
 		if(state->savedState)
 		{
 			// We are starting with a previous saved state; restore from it.
@@ -64,7 +70,7 @@ namespace aengine
 		// loop waiting for stuff to do.
 
 		int param[5]={0};
-		unsigned int a_event;
+		unsigned int a_event=0;
 		while(!done)
 		{
 			// Read all pending events.
@@ -76,7 +82,7 @@ namespace aengine
 			// If active, we loop until all events are read, then continue
 			// to draw the next frame of animation.
 			while((ident=ALooper_pollAll(this->active?0:-1,NULL,&events,
-					static_cast<void**>(&source)))>=0)
+					reinterpret_cast<void**>(&source)))>=0)
 			{
 				// Process this event.
 				if(source)
@@ -97,6 +103,12 @@ namespace aengine
 					done=true;
 					LOGI("Destroy requested");
 				}
+
+				if(a_event)
+				{
+					this->CallEvent(a_event,param);
+					a_event=0;
+				}
 			}
 			this->CallEvent(AE_REFRESH,param);
 		}
@@ -104,7 +116,7 @@ namespace aengine
 		return nullptr;
 	}
 
-	static int32_t AEAndroidWindow::HandleInput(struct android_app *app,AInputEvent *event)
+	int32_t AEAndroidWindow::HandleInput(struct android_app *app,AInputEvent *event)
 	{
 		if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_MOTION)
 		{
@@ -114,9 +126,10 @@ namespace aengine
 		{
 			LOGW("Key input");
 		}
+		return 0;
 	}
 
-	static int32_t AEAndroidWindow::HandleCmd(struct android_app *app,int32_t cmd)
+	void AEAndroidWindow::HandleCmd(struct android_app *app,int32_t cmd)
 	{
 		AEAndroidWindow *wnd=static_cast<AEAndroidWindow*>(app->userData);
 
@@ -132,7 +145,7 @@ namespace aengine
 			break;
 		case APP_CMD_INIT_WINDOW:
 			// The window is being shown, get it ready.
-			if(wnd->app->window!=nullptr)
+			if(wnd->a_app->window!=nullptr)
 			{
 				wnd->InitDisplay();
 				LOGI("Init window");
@@ -144,11 +157,11 @@ namespace aengine
 			LOGI("Terminate window");
 			break;
 		case APP_CMD_GAINED_FOCUS:
-			this->active=true;
+			wnd->active=true;
 			LOGI("Window activated");
 			break;
 		case APP_CMD_LOST_FOCUS:
-			this->active=false;
+			wnd->active=false;
 			LOGI("Window lost focus");
 			break;
 		}
@@ -156,7 +169,7 @@ namespace aengine
 
 	int AEAndroidWindow::InitDisplay(void)
 	{
-		if(!app)
+		if(!a_app)
 			return AE_ERR;
 
 		// initialize OpenGL ES and EGL
@@ -172,7 +185,7 @@ namespace aengine
 				EGL_RED_SIZE, 8,
 				EGL_NONE
 		};
-		EGLint w, h, dummy, format;
+		EGLint w, h, format;
 		EGLint numConfigs;
 		EGLConfig config;
 

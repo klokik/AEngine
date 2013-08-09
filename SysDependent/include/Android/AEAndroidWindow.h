@@ -30,7 +30,7 @@ namespace aengine
 		virtual void *WndProc(void *param) override;
 
 		static int32_t HandleInput(struct android_app *app,AInputEvent *event);
-		static int32_t HandleCmd(struct android_app *app,int32_t cmd);
+		static void HandleCmd(struct android_app *app,int32_t cmd);
 
 		int InitDisplay(void);
 		void TerminateDisplay(void);
