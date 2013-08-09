@@ -1,4 +1,12 @@
-# !!!! OPTIONS !!!!
+option(BUILD_VISION "Use AEVision plugin" OFF)
+message("Build AEVision: ${BUILD_VISION}")
+if(BUILD_VISION)
+	add_subdirectory(AEVision)
+endif()
 
-# add_subdirectory(AEVision)
-add_subdirectory(COLLADA)
+option(BUILD_COLLADA "Use COLLADA DOM plugin" OFF)
+message("Build COLLADA DOM plugin: ${BUILD_COLLADA}")
+if(BUILD_COLLADA)
+	add_subdirectory(COLLADA)
+endif()
+

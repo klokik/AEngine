@@ -16,12 +16,9 @@ project(AEngine2)
 include(aengine2.cmake)
 
 #set build output folders
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/build)
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
+set( RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/libs )
+set( ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
 
 #we use this variable to add different include pathes thoughout project
 set(INCLUDES "Tests" CACHE INTERNAL "include directories" FORCE)
