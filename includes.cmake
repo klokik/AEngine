@@ -2,6 +2,7 @@ set(INCLUDES ${INCLUDES}
 	Base/include
 	RenderUnits/GL/include
 	RenderUnits/GLSL/include
+	RenderUnits/GLES/include
 	SysDependent/include
 	Plugins/AEVision/include
 	Plugins/COLLADA/include

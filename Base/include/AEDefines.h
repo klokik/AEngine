@@ -22,6 +22,7 @@ typedef void  (*AE_EVENT)(int *);
 #define AE_WINDOW_TYPE		AE_TYPE
 #define AE_SDL_WINDOW		0x20
 #define AE_SDLGL_WINDOW		0x21
+#define AE_SDLEGL_WINDOW	0x22
 
 #define AE_INIT_SCENE		0x0001
 #define AE_INIT_WINDOW		0x0002
@@ -34,6 +35,7 @@ typedef void  (*AE_EVENT)(int *);
 #define AE_RENDER_GL		0x0008
 #define AE_RENDER_GLSL		0x0009
 #define AE_RENDER_D3D		0x0010
+#define AE_RENDER_GLES		0x0011
 
 //TODO: move this definitions to separete header files where this objects are defined
 // as it's inconvinient to rebuild the whole project after changing one definition
