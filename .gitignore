@@ -21,6 +21,7 @@ cmake_install.cmake
 
 build/
 bin/*
+libs/*
 # Tests/
 Project
 
@@ -43,4 +44,5 @@ proguard-project.txt
 
 SysDependent/android/bin/
 SysDependent/android/gen/
+SysDependent/android/libs
 
