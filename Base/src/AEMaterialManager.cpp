@@ -6,7 +6,9 @@
  */
 
 #include <stddef.h>
-#include <SDL/SDL_image.h>
+#include <stdlib.h>
+#include <stdio.h>
+//#include <SDL/SDL_image.h>
 
 #include "AEMaterialManager.h"
 
@@ -39,16 +41,16 @@ AEMaterial *AEMaterialManager::New(void)
 
 int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
 {
-	if(!this->IMGinit)
-	{
-		if(!IMG_Init(IMG_INIT_PNG|IMG_INIT_JPG))
-			return -1;
-			else IMGinit=true;
-	}
+	// if(!this->IMGinit)
+	// {
+	// 	if(!IMG_Init(IMG_INIT_PNG|IMG_INIT_JPG))
+	// 		return -1;
+	// 		else IMGinit=true;
+	// }
 
-	SDL_Surface *surf=IMG_Load(filename);
+//	SDL_Surface *surf=IMG_Load(filename);
 
-	if(!surf) return -2;
+//	if(!surf) return -2;
 
 	if(tex)
 	{
@@ -58,16 +60,16 @@ int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
 	else
 		tex=(AETexture*)malloc(sizeof(AETexture));
 
-	tex->width=surf->w;
-	tex->height=surf->h;
+	tex->width=256;//surf->w;
+	tex->height=256;//surf->h;
 
 	//tex.pixelformat=surf->format;
-	tex->bpp=surf->pitch/surf->w*8;
-	tex->size=surf->pitch*surf->h;
+	tex->bpp=32;//surf->pitch/surf->w*8;
+	tex->size=tex->width*tex->height*tex->bpp/8;//surf->pitch*surf->h;
 
 	tex->data=malloc(tex->size);
 	//copy and flip texture vertically
-	memcpy(tex->data,surf->pixels,tex->size);
+//	memcpy(tex->data,surf->pixels,tex->size);
 	// for(size_t q=0;q<surf->h;q++)
 	// {
 		// memcpy(tex->data+q*surf->w,surf->pixels+q*surf->w,surf->w);
@@ -80,7 +82,7 @@ int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
 	// 	((uint8_t*)tex->data)[q+2]=((uint8_t*)surf->pixels)[tex->size-q-1];
 	// }
 
-	SDL_FreeSurface(surf);
+//	SDL_FreeSurface(surf);
 
 	printf("Texture loaded %dx%d\n",tex->width,tex->height);
 
@@ -118,7 +120,6 @@ void AEMaterialManager::FreeTexture(AETexture *tex)
 
 AEMaterialManager::~AEMaterialManager(void)
 {
-	//WARNING C++11
 	for(AEMaterial *mat:this->materials)
 		this->OptimizeTexture(mat->texture);	//free memory kept by texture but not remove texture itself, as it can be used by several materials
 

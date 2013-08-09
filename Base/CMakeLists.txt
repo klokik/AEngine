@@ -13,4 +13,4 @@ endforeach()
 
 
 #add following as option
-set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} SDL_image CACHE INTERNAL "additional libraries")
+#set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} SDL_image CACHE INTERNAL "additional libraries")
