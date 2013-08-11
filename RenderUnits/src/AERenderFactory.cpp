@@ -7,6 +7,9 @@
 
 #include <string.h>
 
+#include "render_build_config.h"
+
+
 #if defined(BUILD_GL_RENDER)
 	#include "AEGLRender.h"
 #endif

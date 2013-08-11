@@ -1,5 +1,7 @@
 set(INCLUDES ${INCLUDES}
+	build_configs/
 	Base/include
+	RenderUnits/include
 	RenderUnits/GL/include
 	RenderUnits/GLSL/include
 	RenderUnits/GLES/include

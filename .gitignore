@@ -25,6 +25,8 @@ libs/*
 # Tests/
 Project
 
+build_configs/*.h
+
 ChangeLog
 # CMakeLists.txt
 CMakeCache.txt

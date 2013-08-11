@@ -6,17 +6,28 @@ message("Build GL: ${BUILD_GL_RENDER}")
 message("Build GLSL: ${BUILD_GLSL_RENDER}")
 message("Build GLES: ${BUILD_GLES_RENDER}")
 
+configure_file(${AE_CONFIG_DIR}/render_build_config.h.in
+	${AE_CONFIG_DIR}/render_build_config.h)
+
+set(render_units "")
+
 if(BUILD_GL_RENDER OR BUILD_GLSL_RENDER)
-	add_definitions(-DBUILD_GL_RENDER)
+	set(render_units ${render_units} "aengine_gl_render")
 	add_subdirectory(GL)
 endif()
 
 if(BUILD_GLSL_RENDER)
-	add_definitions(-DBUILD_GLSL_RENDER)
+	set(render_units ${render_units} "aengine_glsl_render")
 	add_subdirectory(GLSL)
 endif()
 
 if(BUILD_GLES_RENDER)
-	add_definitions(-DBUILD_GLES_RENDER)
+	set(render_units ${render_units} "aengine_gles_render")
 	add_subdirectory(GLES)
 endif()
+
+add_library(aengine_render_factory OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/src/AERenderFactory.cpp)
+add_library(aengine_render_factory_static $<TARGET_OBJECTS:aengine_render_factory>)
+target_link_libraries(aengine_render_factory_static ${render_units})
+
+set(AE_LINK_COMPONENTS ${AE_LINK_COMPONENTS} aengine_render_factory_static CACHE INTERNAL "")

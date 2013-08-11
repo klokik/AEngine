@@ -1,0 +1,3 @@
+#cmakedefine BUILD_GL_RENDER
+#cmakedefine BUILD_GLSL_RENDER
+#cmakedefine BUILD_GLES_RENDER
