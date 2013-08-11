@@ -13,20 +13,24 @@
 
 #include "AERender.h"
 
-class AERenderFactory
+
+namespace aengine
 {
-	std::vector<std::string> units;
+	class AERenderFactory
+	{
+		std::vector<std::string> units;
 
-public:
-	AERenderFactory();
+	public:
+		AERenderFactory();
 
-	const std::vector<std::string> &ListAvailableRenderUnits(void);
+		const std::vector<std::string> &ListAvailableRenderUnits(void);
 
-	AERenderUnit *GetRenderUnit();
-	AERenderUnit *GetRenderUnit(uint32_t type);
-	AERenderUnit *GetRenderUnit(const char *type);
+		AERenderUnit *GetRenderUnit();
+		AERenderUnit *GetRenderUnit(uint32_t type);
+		AERenderUnit *GetRenderUnit(const char *type);
 
-	virtual ~AERenderFactory();
-};
+		virtual ~AERenderFactory();
+	};
+}
 
 #endif /* AERENDERFACTORY_H_ */

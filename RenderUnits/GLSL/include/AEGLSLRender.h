@@ -14,74 +14,78 @@
 
 #include "AEGLSLFilter.h"
 
-class AEGLSLBasicProgram;
 
-class AEGLSLRenderUnit: public AEGLRenderUnit
+namespace aengine
 {
-protected:
-	AEGLSLProgramManager pmanager;
+	class AEGLSLBasicProgram;
 
-	AEGLSLProgram3vc	*p_3vc;
-	AEGLSLProgram3vmn	*p_3vmn;
-	// AEGLSLProgram3vctnl *p_3vctnl;
+	class AEGLSLRenderUnit: public AEGLRenderUnit
+	{
+	protected:
+		AEGLSLProgramManager pmanager;
 
-	AEGLSLProgram2vsquarelight *p_post_invert;
+		AEGLSLProgram3vc	*p_3vc;
+		AEGLSLProgram3vmn	*p_3vmn;
+		// AEGLSLProgram3vctnl *p_3vctnl;
 
-	//framebuffer object to render scene into it
-	// uint fbo_main;
+		AEGLSLProgram2vsquarelight *p_post_invert;
 
-	//framebuffer used for deferred rendering
-	uint fbo_gbuffer;
-	AEGLBuffer g_color;
-	AEGLBuffer g_depth;
-	AEGLBuffer g_position;
-	AEGLBuffer g_normal;
+		//framebuffer object to render scene into it
+		// uint fbo_main;
 
-	//framebuffer object for rendering texture to texture per pixel
-	uint fbo_post;
-	AEGLBuffer post_color;
+		//framebuffer used for deferred rendering
+		uint fbo_gbuffer;
+		AEGLBuffer g_color;
+		AEGLBuffer g_depth;
+		AEGLBuffer g_position;
+		AEGLBuffer g_normal;
 
-	//Framebuffer for Other, Not Deferred Stuff (ONDS)
-	uint fbo_onds;
-	AEGLBuffer onds_depth;
-	AEGLBuffer onds_color;
+		//framebuffer object for rendering texture to texture per pixel
+		uint fbo_post;
+		AEGLBuffer post_color;
 
-	//AEGLSLFilter filter;
-	//AEGLBuffer color_output;
+		//Framebuffer for Other, Not Deferred Stuff (ONDS)
+		uint fbo_onds;
+		AEGLBuffer onds_depth;
+		AEGLBuffer onds_color;
 
-	virtual int StartInit(void);
-	virtual int InitPrograms(void);
-	virtual int InitFramebuffers(void);
-	virtual int ResizeFramebuffers(void);
+		//AEGLSLFilter filter;
+		//AEGLBuffer color_output;
 
-	virtual void BlitToScreen(void);
-	virtual void PostProcess(AEObjectCamera *camera);
+		virtual int StartInit(void);
+		virtual int InitPrograms(void);
+		virtual int InitFramebuffers(void);
+		virtual int ResizeFramebuffers(void);
 
-	virtual int Init3vcProgram(void);
-	virtual int Init3vmnProgram(void);
-	virtual int InitPostPrograms(void);
+		virtual void BlitToScreen(void);
+		virtual void PostProcess(AEObjectCamera *camera);
 
-	virtual unsigned int GetGLSLVersion(void);
+		virtual int Init3vcProgram(void);
+		virtual int Init3vmnProgram(void);
+		virtual int InitPostPrograms(void);
 
-	virtual void RenderEmpty(AEObject * obj);
-	virtual void RenderMesh(AEObjectMesh * obj);
+		virtual unsigned int GetGLSLVersion(void);
 
-	virtual void RenderMeshes(void);
-	virtual void RenderEmpties(void);
+		virtual void RenderEmpty(AEObject * obj);
+		virtual void RenderMesh(AEObjectMesh * obj);
 
-//	virtual void RenderSpritePersp(const AESpriteObject & obj);
-//	virtual void RenderSpritesOrtho(void);
+		virtual void RenderMeshes(void);
+		virtual void RenderEmpties(void);
 
-public:
-	AEGLSLRenderUnit();
+	//	virtual void RenderSpritePersp(const AESpriteObject & obj);
+	//	virtual void RenderSpritesOrtho(void);
 
-	virtual int Init(uint16_t _width,uint16_t _height);
-	virtual void Resize(uint16_t _width,uint16_t _height);
-	//virtual void RenderObject(const AEObject * obj);
+	public:
+		AEGLSLRenderUnit();
 
-	virtual void Render(AEObjectCamera *camera);
+		virtual int Init(uint16_t _width,uint16_t _height);
+		virtual void Resize(uint16_t _width,uint16_t _height);
+		//virtual void RenderObject(const AEObject * obj);
 
-	virtual ~AEGLSLRenderUnit();
-};
+		virtual void Render(AEObjectCamera *camera);
+
+		virtual ~AEGLSLRenderUnit();
+	};
+}
 
 #endif /* AEGLSLRENDER_H_ */
