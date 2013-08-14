@@ -15,11 +15,6 @@ project(AEngine2)
 # import version and other properties from external file
 include(aengine2.cmake)
 
-#set build output folders
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/libs )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build )
-
 #we use this variable to add different include pathes thoughout project
 set(INCLUDES "Tests" CACHE INTERNAL "" FORCE)
 # same with libraries that would be linked with executable/to shared library
@@ -44,7 +39,8 @@ add_subdirectory(Plugins)
 # 	message("lib: " ${lib})
 # endforeach() 
 
-add_library(${AE_BINARY_NAME} ${AE_LINK} dummy.cpp)
+# ${AE_LINK}
+add_library(${AE_BINARY_NAME} STATIC dummy.cpp)
 target_link_libraries(${AE_BINARY_NAME} ${AE_LINK_COMPONENTS} ${ADDITIONAL_LIBRARIES})
 # add_executable(ae_test ${PROJECT_SOURCE_DIR}/Tests/skel_test.cpp)
 # target_link_libraries(ae_test aengine)

@@ -46,7 +46,7 @@ namespace aengine
 
 				AERenderFactory rfactory;
 
-				this->render=rfactory.GetRenderUnit("GL");
+				this->render=rfactory.GetRenderUnit("GLSL");
 				if(this->render==NULL)
 				{
 					puts("Incorrect RenderUnit");
@@ -61,7 +61,7 @@ namespace aengine
 			}
 			else
 			{
-				this->window->InitWindow(640,480,16,AE_SDL_WINDOW);
+				this->window->InitWindow(640,480,16,NULL);
 			}
 		}
 		if(flags&AE_INIT_SCENE)

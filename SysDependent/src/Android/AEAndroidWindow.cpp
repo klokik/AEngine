@@ -24,15 +24,16 @@ int main(int argc,char **argv);
 
 extern "C"
 {
+	static struct android_app *start_state=nullptr;
 	// Android entry point
 	void android_main(struct android_app *state)
 	{
 		// check if glue was not stripped
-		//app_dummy();
+		app_dummy();
 
 		LOGI("App started");
 
-		return;
+		start_state=state;
 
 		main(1,(char**)&state);
 	}
@@ -47,16 +48,18 @@ namespace aengine
 		context=EGL_NO_CONTEXT;
 		surface=EGL_NO_SURFACE;
 
-		a_app=nullptr;
+		a_app=start_state;//nullptr;
 
 		LOGI("Window created");
 	}
 
 	void *AEAndroidWindow::WndProc(void* wparam)
 	{
-		struct android_app *state=static_cast<AEAndroidWindow*>(wparam)->a_app;
+		struct android_app *state=this->a_app;
 
-		state->userData=wparam;
+		state->onAppCmd=AEAndroidWindow::HandleCmd;
+		state->onInputEvent=AEAndroidWindow::HandleInput;
+		state->userData=this;
 
 		if(state->savedState)
 		{
@@ -110,7 +113,16 @@ namespace aengine
 					a_event=0;
 				}
 			}
-			this->CallEvent(AE_REFRESH,param);
+			if(active)
+			{
+				static float iter=0.0f;
+				glClearColor(iter,1.0f-iter,(iter-0.5f)*0.3f+0.5f,1.0f);
+				glClear(GL_COLOR_BUFFER_BIT);
+				iter+=0.05f;
+				if(iter>1.0f)
+					iter=0.0f;
+				this->CallEvent(AE_REFRESH,param);
+			}
 		}
 
 		return nullptr;
@@ -141,28 +153,31 @@ namespace aengine
 			// *((struct saved_state*)wnd->app->savedState) = wnd->state;
 			// wnd->app->savedStateSize = sizeof(struct saved_state);
 			// wnd->engine->Suspend()
-			LOGI("Save state");
+			LOGI("cmd: Save state");
 			break;
 		case APP_CMD_INIT_WINDOW:
 			// The window is being shown, get it ready.
-			if(wnd->a_app->window!=nullptr)
+			if(wnd->a_app->window)
 			{
-				wnd->InitDisplay();
-				LOGI("Init window");
+				LOGI("cmd: Init window");
+				if(!wnd->InitDisplay())
+				{
+					LOGW("Display init FAILED");
+				}
 			}
 			break;
 		case APP_CMD_TERM_WINDOW:
 			// The window is being hidden or closed, clean it up.
 			wnd->TerminateDisplay();
-			LOGI("Terminate window");
+			LOGI("cmd: Terminate window");
 			break;
 		case APP_CMD_GAINED_FOCUS:
 			wnd->active=true;
-			LOGI("Window activated");
+			LOGI("cmd: Window activated");
 			break;
 		case APP_CMD_LOST_FOCUS:
 			wnd->active=false;
-			LOGI("Window lost focus");
+			LOGI("cmd: Window lost focus");
 			break;
 		}
 	}
@@ -170,7 +185,10 @@ namespace aengine
 	int AEAndroidWindow::InitDisplay(void)
 	{
 		if(!a_app)
+		{
+			LOGW("Something's wrong with world::a_app");
 			return AE_ERR;
+		}
 
 		// initialize OpenGL ES and EGL
 		/*
@@ -218,6 +236,7 @@ namespace aengine
 		eglQuerySurface(display,surface,EGL_WIDTH,&w);
 		eglQuerySurface(display,surface,EGL_HEIGHT,&h);
 
+
 		if(width!=w||height!=h)
 		{
 			width=w;
@@ -228,6 +247,8 @@ namespace aengine
 			param[1]=this->height;
 			this->CallEvent(AE_EVENT_RESIZE,param);
 		}
+		
+		LOGI("Display init succeed: %dx%d",w,h);
 
 		return AE_OK;
 	}
@@ -256,7 +277,8 @@ namespace aengine
 	{
 		AEWindow::InitWindow(_width,_height,_bpp,_type);
 
-		return InitDisplay();
+		LOGI("Init window");
+		return AE_OK;//InitDisplay();
 	}
 
 	void AEAndroidWindow::SetCursorPos(uint16_t x,uint16_t y)

@@ -10,9 +10,10 @@ set(LOCAL_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/AEWindowFactory.cpp)
 
 if(TARGET_PLATFORM MATCHES "Android")
+	add_library(android_glue OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/src/Android/native_app_glue/android_native_app_glue.c)
 	set(LOCAL_SRCS ${LOCAL_SRCS}
 		${CMAKE_CURRENT_SOURCE_DIR}/src/Android/AEAndroidWindow.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/Android/native_app_glue/android_native_app_glue.c)
+		$<TARGET_OBJECTS:android_glue>)
 	set(LOCAL_OTHER_LIBS EGL GLESv2 android log)
 else()
 	set(LOCAL_SRCS ${LOCAL_SRCS} 
