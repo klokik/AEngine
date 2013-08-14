@@ -147,6 +147,8 @@ namespace aengine
 	{
 		type_cache.Clear();
 
+		this->SetFixedProjectionMatrix();
+
 		if(camera!=NULL)
 		{
 			this->curCam=camera;

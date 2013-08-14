@@ -80,7 +80,7 @@ namespace aengine
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 
-		this->Set2DMode();
+		// this->Set2DMode();
 		this->SetFixedProjectionMatrix();
 
 		for(AEObjectSprite *obj:type_cache.sprites_ortho)
@@ -97,7 +97,7 @@ namespace aengine
 				glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 		}
 
-		this->PopMode();
+		// this->PopMode();
 		this->SetFixedProjectionMatrix();
 
 		glDisableClientState(GL_VERTEX_ARRAY);

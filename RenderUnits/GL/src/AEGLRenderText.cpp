@@ -31,6 +31,7 @@ namespace aengine
 		if(obj->projection==AE_ORTHOGRAPHIC)
 		{
 			this->Set2DMode();
+			this->SetFixedProjectionMatrix();
 			glLoadMatrixf(obj->GetWorldMatrix().ToArray());
 		}
 		else
@@ -80,7 +81,10 @@ namespace aengine
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		if(obj->projection==AE_ORTHOGRAPHIC)
+		{
 			this->PopMode();
+			this->SetFixedProjectionMatrix();
+		}
 	}
 
 	void AEGLRenderUnit::RenderTexts(void)
