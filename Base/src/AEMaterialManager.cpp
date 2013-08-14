@@ -69,6 +69,7 @@ int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
 	tex->size=tex->width*tex->height*tex->bpp/8;//surf->pitch*surf->h;
 
 	tex->data=malloc(tex->size);
+	memset(tex->data,128,tex->size);
 	//copy and flip texture vertically
 //	memcpy(tex->data,surf->pixels,tex->size);
 	// for(size_t q=0;q<surf->h;q++)

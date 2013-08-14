@@ -81,6 +81,7 @@ namespace aengine
 		glEnableClientState(GL_NORMAL_ARRAY);
 
 		this->Set2DMode();
+		this->SetFixedProjectionMatrix();
 
 		for(AEObjectSprite *obj:type_cache.sprites_ortho)
 		{
@@ -97,6 +98,7 @@ namespace aengine
 		}
 
 		this->PopMode();
+		this->SetFixedProjectionMatrix();
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);

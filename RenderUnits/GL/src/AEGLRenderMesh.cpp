@@ -44,6 +44,7 @@ namespace aengine
 		if(obj->projection==AE_ORTHOGRAPHIC)
 		{
 			this->Set2DMode();
+			this->SetFixedProjectionMatrix();
 			glLoadMatrixf(obj->GetWorldMatrix().ToArray());
 		}
 		else
@@ -52,7 +53,10 @@ namespace aengine
 		glDrawElements(GL_TRIANGLES,obj->mesh->fcecount*3,GL_UNSIGNED_INT,0);
 
 		if(obj->projection==AE_ORTHOGRAPHIC)
+		{
 			this->PopMode();
+			this->SetFixedProjectionMatrix();
+		}
 
 
 		if(cTexCoord)

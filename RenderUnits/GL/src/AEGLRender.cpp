@@ -80,16 +80,20 @@ namespace aengine
 		this->width=_width;
 		this->height=_height;
 
-		GLfloat ratio;									// window aspect ratio width/height
-		if(height==0) height=1;	 						//protect from division by zero
-		ratio=(GLfloat)width/(GLfloat)height;
+		// protect from division by zero
+		if(height==0) height=1;
+		if(width==0) width=1;
 
 		glViewport(0,0,(GLfloat)width,(GLfloat)height); // Set up viewport
-		glMatrixMode(GL_PROJECTION);					// Change to the projection
-		glLoadIdentity();								// matrix and set viewing volume
-		gluPerspective(45.0f,ratio,0.1f,200.0f);		// Set perspective
-		glMatrixMode(GL_MODELVIEW);						//Make sure we are changing modelview, not projection
-		glLoadIdentity();								// Reset the view
+
+		// recalculate orthographic matrix
+		float o_mtx[16]={
+			2.0f/width, 0, 0,0,
+			0, 2.0f/height, 0,0,
+			0,0,-1,0,
+			-1,-1,0,1
+		};
+		orthomatrix=o_mtx;
 	}
 
 	void AEGLRenderUnit::QueueObject(AEObject * obj)
@@ -143,14 +147,16 @@ namespace aengine
 	{
 		type_cache.Clear();
 
-		mvsmatrix.SetIdentity();
-
 		if(camera!=NULL)
 		{
 			this->curCam=camera;
 
 			camera->CalculateCameraMatrix(false);
 			cammatrix=camera->GetCameraMatrix();
+
+			camera->ratio=width/(float)height;
+			camera->InvalidateProjection();
+			prjmatrix=camera->GetProjectionMatrix();
 		}
 
 
@@ -192,16 +198,9 @@ namespace aengine
 
 	void AEGLRenderUnit::Set2DMode(void)
 	{
-		//TODO Use own projection matrices
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glOrtho(0,width,0,height,-1.0,1.0);
-		float mat[16];
-		glGetFloatv(GL_PROJECTION_MATRIX,mat);
-		prjmatrix=mat;
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
+		prjmatrix.PushMatrix();
+
+		prjmatrix=orthomatrix;
 
 		glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_LIGHTING_BIT);
 		glDisable(GL_DEPTH_TEST);
@@ -210,14 +209,19 @@ namespace aengine
 
 	void AEGLRenderUnit::PopMode(void)
 	{
+		prjmatrix.PopMatrix();
+
 		glPopAttrib();
+	}
+
+	void AEGLRenderUnit::SetFixedProjectionMatrix()
+	{
+#if !defined(AE_NEW_GL_CONTEXT)
 		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		float mat[16];
-		glGetFloatv(GL_PROJECTION_MATRIX,mat);
-		prjmatrix=mat;
+		glLoadIdentity();
+		glMultMatrixf(prjmatrix);
 		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
+#endif
 	}
 
 	int AEGLRenderUnit::CheckError(void) const

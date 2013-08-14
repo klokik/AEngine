@@ -16,7 +16,7 @@ void AEMatrixStack::PushMatrix(void)
 	m_stack.push(*this);
 }
 
-void AEMatrixStack::PopMartix(void)
+void AEMatrixStack::PopMatrix(void)
 {
 	this->operator=(m_stack.top());
 	m_stack.pop();
