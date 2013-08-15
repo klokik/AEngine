@@ -5,16 +5,11 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "AEGLHeader.h"
 #include "AEDefines.h"
 #include "AEGLRender.h"
 
@@ -204,9 +199,8 @@ namespace aengine
 
 		prjmatrix=orthomatrix;
 
-		glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_LIGHTING_BIT);
+		glPushAttrib(GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
 	}
 
 	void AEGLRenderUnit::PopMode(void)

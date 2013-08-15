@@ -5,14 +5,10 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
 #include <math.h>
 #include <stdio.h>
 
+#include "AEGLHeader.h"
 #include "AEGLSLRender.h"
 
 const float rad=57.29577951f;
