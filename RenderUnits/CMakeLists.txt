@@ -11,6 +11,15 @@ configure_file(${AE_CONFIG_DIR}/render_build_config.h.in
 
 set(render_units "")
 
+if(TARGET_PLATFORM STREQUAL "xNIX")
+	set(GLES_LIB GLESv2)
+elseif(TARGET_PLATFORM STREQUAL "Android")
+	set(GLES_LIB GLESv3)
+else()
+	message(SEND_ERROR "Unknown platform, trying to use GLESv2")
+	set(GLES_LIB GLESv2)
+endif()
+
 if(BUILD_GL_RENDER OR BUILD_GLSL_RENDER)
 	set(render_units ${render_units} "aengine_gl_render")
 	add_subdirectory(GL)
@@ -28,6 +37,6 @@ endif()
 
 add_library(aengine_render_factory OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/src/AERenderFactory.cpp)
 add_library(aengine_render_factory_static $<TARGET_OBJECTS:aengine_render_factory>)
-target_link_libraries(aengine_render_factory_static ${render_units})
+target_link_libraries(aengine_render_factory_static ${render_units} ae_debug)
 
 set(AE_LINK_COMPONENTS ${AE_LINK_COMPONENTS} aengine_render_factory_static CACHE INTERNAL "")

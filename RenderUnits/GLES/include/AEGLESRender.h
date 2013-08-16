@@ -10,21 +10,16 @@
 #ifndef AEGLESRENDER_H_
 #define AEGLESRENDER_H_
 
-#include "AERender.h"
+#include "AEGLSLRender.h"
 
 
 namespace aengine
 {
-	class AEGLESRenderUnit: public AERenderUnit
+	class AEGLESRenderUnit: public AEGLSLRenderUnit
 	{
+	protected:
 	public:
-		virtual int Init(uint16_t _width,uint16_t _height);
-		virtual void Resize(uint16_t _width,uint16_t _height);
-
-		virtual void CacheScene(AEScene *scene);
-		virtual void CacheClear(void);
-
-		virtual void Render(AEObjectCamera *camera);
+		AEGLESRenderUnit(void);
 
 		virtual ~AEGLESRenderUnit(void);
 	};

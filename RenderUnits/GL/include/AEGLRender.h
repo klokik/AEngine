@@ -76,20 +76,20 @@ namespace aengine
 		//*/// endregion cache
 
 		virtual void RenderEmpty(AEObject * obj);
-		virtual void RenderMesh(AEObjectMesh * obj);
+		// virtual void RenderMesh(AEObjectMesh * obj);
 		virtual void RenderJoint(AEObjectJoint * obj);
 
-		virtual void RenderText(AEObjectText *obj);
+		// virtual void RenderText(AEObjectText *obj);
 
-		virtual void RenderSpritesPersp(void);
-		virtual void RenderSpritesOrtho(void);
+		// virtual void RenderSpritesPersp(void);
+		// virtual void RenderSpritesOrtho(void);
 
 		virtual void RenderBoundingSphere(AEObject * obj);
 
-		virtual void RenderMeshes(void);
+		// virtual void RenderMeshes(void);
 		virtual void RenderEmpties(void);
 		virtual void RenderJoints(void);
-		virtual void RenderTexts(void);
+		// virtual void RenderTexts(void);
 
 		///returns "true" if object is textured, and "false" in the other case
 		virtual bool ApplyMaterial(AEMaterial *mat);

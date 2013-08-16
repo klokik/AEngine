@@ -12,6 +12,7 @@
 
 namespace aengine
 {
+#if !defined(AE_NEW_GL_CONTEXT)
 	void AEGLRenderUnit::RenderEmpty(AEObject * obj)
 	{
 		glLoadMatrixf(cammatrix*obj->GetWorldMatrix());
@@ -31,14 +32,6 @@ namespace aengine
 
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-	void AEGLRenderUnit::RenderEmpties(void)
-	{
-		for(size_t q=0;q<type_cache.empties.size();q++)
-		{
-			RenderEmpty(type_cache.empties[q]);
-		}
 	}
 
 	void AEGLRenderUnit::RenderBoundingSphere(AEObject * obj)
@@ -87,6 +80,19 @@ namespace aengine
 			glVertex3f(first.X,first.Y,first.Z);
 			glVertex3f(second.X,second.Y,second.Z);
 		glEnd();
+	}
+#else
+	void AEGLRenderUnit::RenderEmpty(AEObject * obj) {};
+	void AEGLRenderUnit::RenderBoundingSphere(AEObject * obj) {};
+	void AEGLRenderUnit::RenderJoint(AEObjectJoint * obj) {};
+#endif /* !AE_NEW_GL_CONTEXT */
+
+	void AEGLRenderUnit::RenderEmpties(void)
+	{
+		for(size_t q=0;q<type_cache.empties.size();q++)
+		{
+			RenderEmpty(type_cache.empties[q]);
+		}
 	}
 
 	void AEGLRenderUnit::RenderJoints(void)

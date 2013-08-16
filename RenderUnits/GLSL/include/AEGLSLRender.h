@@ -22,6 +22,8 @@ namespace aengine
 	class AEGLSLRenderUnit: public AEGLRenderUnit
 	{
 	protected:
+		bool use_MRT;	// use multiple render targets
+
 		AEGLSLProgramManager pmanager;
 
 		AEGLSLProgram3vc	*p_3vc;

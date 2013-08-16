@@ -54,12 +54,14 @@ namespace aengine
 
 	int AEGLRenderUnit::InitGL(void)
 	{
-		glShadeModel(GL_SMOOTH);			// Enable smooth shading
+		// glShadeModel(GL_SMOOTH);			// Enable smooth shading
 		//glClearColor(0.0f,0.2f,0.2f,0.0f);	// Color to use for clearing screen
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
-		glClearDepth(1.0f);					// Specify the depth buffer cleaning value
+		glClearDepthf(1.0f);					// Specify the depth buffer cleaning value
 		glDepthFunc(GL_LEQUAL);				// The type of depth test to do
+#if !defined(AE_NEW_GL_CONTEXT)
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST); //type of perspective calculations;
+#endif
 
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -183,14 +185,14 @@ namespace aengine
 			glEnable(GL_DEPTH_TEST);
 		}
 
-		this->RenderMeshes();
+		// this->RenderMeshes();
 		this->RenderEmpties();
 		this->RenderJoints();
 
-		this->RenderSpritesPersp();
-		this->RenderSpritesOrtho();
+		// this->RenderSpritesPersp();
+		// this->RenderSpritesOrtho();
 
-		this->RenderTexts();
+		// this->RenderTexts();
 	}
 
 	void AEGLRenderUnit::Set2DMode(void)
@@ -199,15 +201,15 @@ namespace aengine
 
 		prjmatrix=orthomatrix;
 
-		glPushAttrib(GL_DEPTH_BUFFER_BIT);
-		glDisable(GL_DEPTH_TEST);
+//		glPushAttrib(GL_DEPTH_BUFFER_BIT);
+//		glDisable(GL_DEPTH_TEST);
 	}
 
 	void AEGLRenderUnit::PopMode(void)
 	{
 		prjmatrix.PopMatrix();
 
-		glPopAttrib();
+//		glPopAttrib();
 	}
 
 	void AEGLRenderUnit::SetFixedProjectionMatrix()
@@ -237,15 +239,17 @@ namespace aengine
 		case GL_INVALID_OPERATION:
 			puts("err: invalid operation;");
 			break;
-		case GL_STACK_OVERFLOW:
-			puts("err: stack underflow;");
-			break;
 		case GL_OUT_OF_MEMORY:
 			puts("err: out of memory;");
+			break;
+#if !defined(AE_NEW_GL_CONTEXT)
+		case GL_STACK_OVERFLOW:
+			puts("err: stack underflow;");
 			break;
 		case GL_TABLE_TOO_LARGE:
 			puts("err: table too large;");
 			break;
+#endif
 		}
 		return AE_ERR;
 	}
@@ -262,6 +266,7 @@ namespace aengine
 
 	bool AEGLRenderUnit::ApplyMaterial(AEMaterial *mat)
 	{
+#if !defined(AE_NEW_GL_CONTEXT)
 		if(!mat)
 		{
 			glColor3f(1.0f,1.0f,1.0f);
@@ -279,6 +284,7 @@ namespace aengine
 				return true;
 			}
 		}
+#endif
 		return false;
 	}
 

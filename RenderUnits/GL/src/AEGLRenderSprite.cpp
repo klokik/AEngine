@@ -11,6 +11,7 @@
 #include "AEGLRender.h"
 
 
+#if !defined(AE_NEW_GL_CONTEXT)
 namespace aengine
 {
 	const float rad=57.29577951f;
@@ -101,3 +102,4 @@ namespace aengine
 		glDisableClientState(GL_NORMAL_ARRAY);
 	}
 }
+#endif /* !AE_NEW_GL_CONTEXT */

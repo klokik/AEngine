@@ -10,6 +10,7 @@
 #include "AEVectorMath.h"
 
 
+#if !defined(AE_NEW_GL_CONTEXT)
 namespace aengine
 {
 	void AEGLRenderUnit::RenderText(AEObjectText *obj)
@@ -90,3 +91,4 @@ namespace aengine
 		}
 	}
 }
+#endif /* !AE_NEW_GL_CONTEXT */

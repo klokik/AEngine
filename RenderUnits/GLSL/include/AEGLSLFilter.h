@@ -1,7 +1,7 @@
 #ifndef AEGLSLFILTER_H_
 #define AEGLSLFILTER_H_
 
-#include "GL/gl.h"
+#include "AEGLHeader.h"
 #include "AEGLSLDerivedPrograms.h"
 
 #include <memory>

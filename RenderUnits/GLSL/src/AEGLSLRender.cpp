@@ -6,44 +6,63 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
 
 #include "AEGLHeader.h"
 #include "AEGLSLRender.h"
 #include "AEIO.h"
 #include "AEGLSLFilePath.h"
 #include "AEVectorMath.h"
+#include "AEDebug.h"
+
+// Temporary
+#include "../resource/shader/builtin.h"
 
 
 namespace aengine
 {
 	AEGLSLRenderUnit::AEGLSLRenderUnit()
 	{
+		use_MRT=true;
 		p_3vc=NULL;
 		p_3vmn=NULL;
 	}
 
 	int AEGLSLRenderUnit::StartInit(void)
 	{
+#if !defined(BUILD_GLES_RENDER)
 		if(this->GetGLSLVersion()<120)
 			return AE_ERR;
+#endif
 
 		if(!this->InitPrograms())
+		{
+			AEPrintLog("Failed to initialize shaders;");
 			return AE_ERR;
+		}
 
 		if(!this->InitFramebuffers())
+		{
+			AEPrintLog("Failed to allocate framebuffers;");
 			return AE_ERR; 
+		}
 
 		return AE_OK;
 	}
 
 	int AEGLSLRenderUnit::InitPrograms(void)
 	{
+		AEPrintLog("Initializing shaders:");
 		int result=AE_OK;
 
 		result&=this->Init3vcProgram();
-		result&=this->Init3vmnProgram();
-		result&=this->InitPostPrograms();
+		// result&=this->Init3vmnProgram();
+		// result&=this->InitPostPrograms();
 
+		if(result)
+			AEPrintLog("[Done]");
+		else
+			AEPrintLog("[Fail]");
 		return result;
 	}
 
@@ -112,57 +131,63 @@ namespace aengine
 			0,0,width,height,
 			GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
+		if(use_MRT)
+		{
+			glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glBlitFramebuffer(
-			0,0,width,height,
-			width*2/4+24,8,width*3/4+24,height/4+8,
-			GL_COLOR_BUFFER_BIT,GL_NEAREST);
+			glReadBuffer(GL_COLOR_ATTACHMENT0);
+			glBlitFramebuffer(
+				0,0,width,height,
+				width*2/4+24,8,width*3/4+24,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT1);
-		glBlitFramebuffer(
-			0,0,width,height,
-			8,8,width/4+8,height/4+8,
-			GL_COLOR_BUFFER_BIT,GL_NEAREST);
+			glReadBuffer(GL_COLOR_ATTACHMENT1);
+			glBlitFramebuffer(
+				0,0,width,height,
+				8,8,width/4+8,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT2);
-		glBlitFramebuffer(
-			0,0,width,height,
-			width/4+16,8,width*2/4+16,height/4+8,
-			GL_COLOR_BUFFER_BIT,GL_NEAREST);
+			glReadBuffer(GL_COLOR_ATTACHMENT2);
+			glBlitFramebuffer(
+				0,0,width,height,
+				width/4+16,8,width*2/4+16,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		}
 	}
 
 	void AEGLSLRenderUnit::PostProcess(AEObjectCamera *camera)
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_STENCIL_TEST);
-		glDisable(GL_BLEND);
+		if(use_MRT)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_STENCIL_TEST);
+			glDisable(GL_BLEND);
 
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
-		GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1,draw_bufs);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
+			GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
+			glDrawBuffers(1,draw_bufs);
 
-		p_post_invert->Use();
+			p_post_invert->Use();
 
-		p_post_invert->BindData(
-			&this->sprite_mesh,		//mesh
-			g_color->texture_unit,	//texture
-			g_normal->texture_unit,
-			g_position->texture_unit,
-			0,
-			vec2f(width,height),	//texture size
-			vec4f(0,0,0,0),			//float data 0
-			vec4f(0,0,0,0),			//float data 1
-			&lighting_cache);
+			p_post_invert->BindData(
+				&this->sprite_mesh,		//mesh
+				g_color->texture_unit,	//texture
+				g_normal->texture_unit,
+				g_position->texture_unit,
+				0,
+				vec2f(width,height),	//texture size
+				vec4f(0,0,0,0),			//float data 0
+				vec4f(0,0,0,0),			//float data 1
+				&lighting_cache);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
 
-		glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
+			glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 
-		p_post_invert->UnbindData();
+			p_post_invert->UnbindData();
 
-		glUseProgram(0);
+			glUseProgram(0);
+		}
 	}
 
 	int AEGLSLRenderUnit::ResizeFramebuffers(void)
@@ -221,10 +246,13 @@ namespace aengine
 		sv=this->pmanager.NewShader(GL_VERTEX_SHADER);
 		sf=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
 
-		const char **data=AEReadTextFileCml(AEGLSL_PATH_3VC_V);
+		if(!sv||!sf)
+			return AE_ERR;
+
+		const char **data=&_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VC_V);
 		if(*data==AE_ERR) return AE_ERR;
 		sv->ShaderData(data,1,NULL);
-		data=AEReadTextFileCml(AEGLSL_PATH_3VC_F);
+		data=&_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VC_F);
 		if(*data==AE_ERR) return AE_ERR;
 		sf->ShaderData(data,1,NULL);
 
@@ -232,16 +260,16 @@ namespace aengine
 		sv->Compile();
 		if(sv->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: v shader compilation failed:");
-			puts(sv->GetLog().c_str());
+			AEPrintLog("err: v shader compilation failed:");
+			AEPrintLog(sv->GetLog());
 			return AE_ERR;
 		}
 		//Fragment shader
 		sf->Compile();
 		if(sf->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: f shader compilation failed:");
-			puts(sf->GetLog().c_str());
+			AEPrintLog("err: f shader compilation failed:");
+			AEPrintLog(sf->GetLog());
 			return AE_ERR;
 		}
 
@@ -251,14 +279,16 @@ namespace aengine
 		this->p_3vc->Link();
 		if(this->p_3vc->GetLinkStatus()!=GL_TRUE)
 		{
-			puts("err: program linkage failed:");
-			puts(this->p_3vc->GetLog().c_str());
+			AEPrintLog("err: program linkage failed:");
+			AEPrintLog(this->p_3vc->GetLog());
 			return AE_ERR;
 		}
 
 		this->p_3vc->GetShaderProperties();
 
-		printf("Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
+		char buf[1024];
+		sprintf(buf,"Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
+		AEPrintLog(buf);
 		return AE_OK;
 	}
 
@@ -280,16 +310,16 @@ namespace aengine
 		sv_mesh->Compile();
 		if(sv_mesh->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: v shader compilation failed:");
-			puts(sv_mesh->GetLog().c_str());
+			AEPrintLog("err: v shader compilation failed:");
+			AEPrintLog(sv_mesh->GetLog());
 			return AE_ERR;
 		}
 		//Fragment shader
 		sf_mesh->Compile();
 		if(sf_mesh->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: f shader compilation failed:");
-			puts(sf_mesh->GetLog().c_str());
+			AEPrintLog("err: f shader compilation failed:");
+			AEPrintLog(sf_mesh->GetLog());
 			return AE_ERR;
 		}
 
@@ -299,8 +329,8 @@ namespace aengine
 		this->p_3vmn->Link();
 		if(this->p_3vmn->GetLinkStatus()!=GL_TRUE)
 		{
-			puts("err: program linkage failed:");
-			puts(this->p_3vmn->GetLog().c_str());
+			AEPrintLog("err: program linkage failed:");
+			AEPrintLog(this->p_3vmn->GetLog());
 			return AE_ERR;
 		}
 
@@ -330,16 +360,16 @@ namespace aengine
 		sv_mesh->Compile();
 		if(sv_mesh->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: v shader compilation failed:");
-			puts(sv_mesh->GetLog().c_str());
+			AEPrintLog("err: v shader compilation failed:");
+			AEPrintLog(sv_mesh->GetLog());
 			return AE_ERR;
 		}
 		//Fragment shader
 		sf_mesh->Compile();
 		if(sf_mesh->GetCompileStatus()!=GL_TRUE)
 		{
-			puts("err: f shader compilation failed:");
-			puts(sf_mesh->GetLog().c_str());
+			AEPrintLog("err: f shader compilation failed:");
+			AEPrintLog(sf_mesh->GetLog());
 			return AE_ERR;
 		}
 
@@ -349,8 +379,8 @@ namespace aengine
 		this->p_post_invert->Link();
 		if(this->p_post_invert->GetLinkStatus()!=GL_TRUE)
 		{
-			puts("err: program linkage failed:");
-			puts(this->p_post_invert->GetLog().c_str());
+			AEPrintLog("err: program linkage failed:");
+			AEPrintLog(this->p_post_invert->GetLog());
 			return AE_ERR;
 		}
 

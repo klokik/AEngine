@@ -12,24 +12,28 @@
 
 #include "AEGLSLProgram.h"
 
-class AEGLSLProgramManager
+
+namespace aengine
 {
-protected:
-	std::vector<AEGLSLShader*> shaders;
-	std::vector<AEGLSLProgram*> programs;
+	class AEGLSLProgramManager
+	{
+	protected:
+		std::vector<AEGLSLShader*> shaders;
+		std::vector<AEGLSLProgram*> programs;
 
-public:
-	AEGLSLProgramManager(void);
+	public:
+		AEGLSLProgramManager(void);
 
-	AEGLSLProgram *NewProgram(void);
-	void ReleaseProgram(AEGLSLProgram *program);
+		AEGLSLProgram *NewProgram(void);
+		void ReleaseProgram(AEGLSLProgram *program);
 
-	AEGLSLShader *NewShader(uint32_t type);
-	void ReleaseShader(AEGLSLShader *shader);
+		AEGLSLShader *NewShader(uint32_t type);
+		void ReleaseShader(AEGLSLShader *shader);
 
-	void Free(void);
+		void Free(void);
 
-	virtual ~AEGLSLProgramManager(void);
-};
+		virtual ~AEGLSLProgramManager(void);
+	};
+}
 
 #endif /* AEGLSLPOGRAMMANAGER_H_ */

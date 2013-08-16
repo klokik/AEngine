@@ -9,6 +9,7 @@
 #include "AEGLRender.h"
 
 
+#if !defined(AE_NEW_GL_CONTEXT)
 namespace aengine
 {
 	void AEGLRenderUnit::RenderMesh(AEObjectMesh * obj)
@@ -71,3 +72,4 @@ namespace aengine
 		}
 	}
 }
+#endif /* !AE_NEW_GL_CONTEXT */
