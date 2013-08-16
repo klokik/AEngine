@@ -9,8 +9,8 @@
 
 #if defined(BUILD_GLES_RENDER)
 
-//#include <GLES2/gl2.h>
-#include <GLES3/gl3.h>
+#include <GLES2/gl2.h>
+//#include <GLES3/gl3.h>
 #define AE_NEW_GL_CONTEXT
 
 #elif defined(BUILD_GL_RENDER)||defined(BUILD_GLSL_RENDER)

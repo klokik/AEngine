@@ -11,3 +11,10 @@ set(INCLUDES ${INCLUDES}
 	/usr/include/collada-dom2.4/
 	# /usr/include/collada-dom2.4/1.4/
 	/usr/include/collada-dom2.4/1.5/)
+
+if(TARGET_PLATFORM STREQUAL "RPI")
+	set(INCLUDES ${INCLUDES}
+		/opt/vc/include/
+		/opt/vc/include/interface/vcos/pthreads
+		/opt/vc/include/interface/vmcs_host/linux)
+endif()

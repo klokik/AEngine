@@ -19,6 +19,9 @@ else()
 	set(LOCAL_SRCS ${LOCAL_SRCS} 
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SDL/AESDLWindow.cpp)
 	set(LOCAL_OTHER_LIBS SDL)
+	if(TARGET_PLATFORM MATCHES "RPI")
+		set(LOCAL_OTHER_LIBS ${LOCAL_OTHER_LIBS} /opt/vc/lib/ bcm_host)
+	endif()
 endif()
 
 add_library(ae_debug ${CMAKE_CURRENT_SOURCE_DIR}/src/AEDebug.cpp)
