@@ -21,7 +21,10 @@ else()
 	set(LOCAL_OTHER_LIBS SDL)
 endif()
 
+add_library(ae_debug ${CMAKE_CURRENT_SOURCE_DIR}/src/AEDebug.cpp)
 add_library(${MODULE_NAME} ${LOCAL_SRCS})
-target_link_libraries(${MODULE_NAME} ${LOCAL_OTHER_LIBS})
 
-set(AE_LINK_COMPONENTS ${AE_LINK_COMPONENTS} ${MODULE_NAME} CACHE INTERNAL "")
+target_link_libraries(${MODULE_NAME} ${LOCAL_OTHER_LIBS} ae_debug)
+
+set(AE_LINK_COMPONENTS ${AE_LINK_COMPONENTS} ${MODULE_NAME} ae_debug CACHE INTERNAL "")
+
