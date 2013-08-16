@@ -203,6 +203,9 @@ namespace aengine
 				EGL_RED_SIZE, 8,
 				EGL_NONE
 		};
+		const EGLint attrib_list[]={
+			EGL_CONTEXT_CLIENT_VERSION, 2
+		};
 		EGLint w, h, format;
 		EGLint numConfigs;
 		EGLConfig config;
@@ -225,7 +228,7 @@ namespace aengine
 		ANativeWindow_setBuffersGeometry(a_app->window, 0, 0, format);
 
 		surface = eglCreateWindowSurface(display, config, a_app->window, NULL);
-		context = eglCreateContext(display, config, NULL, NULL);
+		context = eglCreateContext(display, config, NULL, attrib_list);
 
 		if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE)
 		{
