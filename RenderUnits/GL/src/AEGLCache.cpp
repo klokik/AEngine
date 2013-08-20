@@ -8,6 +8,7 @@
 #include "AEGLHeader.h"
 #include "AEGLRender.h"
 #include "AEObjectMesh.h"
+#include "AEDebug.h"
 
 
 namespace aengine
@@ -28,12 +29,16 @@ namespace aengine
 	//		if(!this->CacheMesh(type_cache.meshes[q].mesh->mesh)) break;
 	//	}
 	//
+		AEPrintLog("CacheMaterials");
 		this->CacheMaterials();
+		AEPrintLog("CacheFonts");
 		this->CacheFonts();
 		//FIXME: avoid of appearing light objects twice in light cache
+		AEPrintLog("BuildLightingCache");
 		this->lighting_cache.BuildCache(this->scene->objects);
 
 		this->cached=true;
+		AEPrintLog("Cache created");
 	}
 
 	void AEGLRenderUnit::CacheClear(void)
@@ -56,6 +61,7 @@ namespace aengine
 
 	int AEGLRenderUnit::CacheObject(AEObject * obj)
 	{
+		AEPrintLog("Start cache object");
 		int result=AE_OK;
 		switch(obj->type)
 		{
@@ -63,6 +69,7 @@ namespace aengine
 			result&=this->CacheMesh(((AEObjectMesh*)obj)->mesh);
 			break;
 		}
+		AEPrintLog("Object "+obj->name+" cached");
 
 		for(size_t q=0;q<obj->children.size();q++)
 		{
@@ -83,6 +90,8 @@ namespace aengine
 		this->textures.push_back(tex->id);
 		glBindTexture(GL_TEXTURE_2D,tex->id);
 
+		AEPrintLog("TexCreated&bound");
+
 		GLenum format=GL_RGB;
 		switch(tex->bpp)
 		{
@@ -94,16 +103,22 @@ namespace aengine
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-#if !defined(AE_NEW_GL_CONTEXT)
-		glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
-#else
-		glGenerateMipmap(GL_TEXTURE_2D);
-#endif
+
+		AEPrintLog("Params set");
+// #if !defined(AE_NEW_GL_CONTEXT)
+// 		glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
+// #else
+// 		glGenerateMipmap(GL_TEXTURE_2D);
+// #endif
 
 		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex->width,tex->height,0,format,GL_UNSIGNED_BYTE,tex->data);
 
+		AEPrintLog("Data loaded");
+
 		if(glGetError()!=GL_NO_ERROR)
 			result=AE_ERR;
+
+		AEPrintLog("Texture loaded succeed");
 
 		return result;
 	}
@@ -114,6 +129,7 @@ namespace aengine
 
 		for(unsigned int q=0;q<this->scene->materials.Count();q++)
 		{
+			AEPrintLog("Cache texture");
 			result=CacheTexture(this->scene->materials[q]->texture);
 			if(result!=AE_OK)
 				break;

@@ -29,9 +29,9 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderEmpties(void)
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
+		glBindFramebuffer(GL_FRAMEBUFFER,0);//fbo_onds);
 		GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1,draw_bufs);
+		// glDrawBuffers(1,draw_bufs);
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);

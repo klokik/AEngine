@@ -27,6 +27,8 @@ namespace aengine
 
 	void AEGLSLShader::ShaderData(const char **str, uint32_t count, const int *length)
 	{
+		AEPrintLog("load shader: ");
+		AEPrintLog(*str);
 		glShaderSource(this->id,count,str,length);
 	}
 
@@ -39,13 +41,16 @@ namespace aengine
 	{
 		int result;
 		glGetShaderiv(this->id,GL_COMPILE_STATUS,&result);
+		char buf[256];
+		sprintf(buf,"compile status: %d",result);
+		AEPrintLog(buf);
 		return result;
 	}
 
 	std::string AEGLSLShader::GetLog(void)
 	{
 		char tmp[128];
-		int mlength;
+		GLint mlength;
 		glGetShaderiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
 		sprintf(tmp,"Log length: %d",mlength);
 		mlength = 2048;

@@ -68,36 +68,37 @@ namespace aengine
 
 	int AEGLSLRenderUnit::InitFramebuffers(void)
 	{
-		glGenFramebuffers(1,&fbo_gbuffer);
+		// glGenFramebuffers(1,&fbo_gbuffer);
 
-		g_color.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
-		g_depth.reset(new _AEGLBuffer(width,height,GL_DEPTH_COMPONENT));
-		g_position.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
-		g_normal.reset(new _AEGLBuffer(width,height,GL_RGB16F));
+		// g_color.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
+		// g_depth.reset(new _AEGLBuffer(width,height,GL_DEPTH_COMPONENT));
+		// g_position.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
+		// g_normal.reset(new _AEGLBuffer(width,height,GL_RGB16F));
 
-		CheckError();
+		// CheckError();
 
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_gbuffer);
+		// glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_gbuffer);
 
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,g_depth->texture_unit,0);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,g_color->texture_unit,0);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT1,GL_TEXTURE_2D,g_position->texture_unit,0);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT2,GL_TEXTURE_2D,g_normal->texture_unit,0);
+		// glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,g_depth->texture_unit,0);
+		// glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,g_color->texture_unit,0);
+		// glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT1,GL_TEXTURE_2D,g_position->texture_unit,0);
+		// glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT2,GL_TEXTURE_2D,g_normal->texture_unit,0);
 
-		if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
-			return AE_ERR;
+		// if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
+		// 	return AE_ERR;
 
 
+		return AE_OK;
 		{	//post process framebuffer
 			glGenFramebuffers(1,&fbo_post);
 
-			post_color.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
+			post_color.reset(new _AEGLBuffer(width,height,GL_RGBA));
 			CheckError();
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_post);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,post_color->texture_unit,0);
+			glBindFramebuffer(GL_FRAMEBUFFER,fbo_post);
+			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,post_color->texture_unit,0);
 
-			if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
+			if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
 				return AE_ERR;
 		}
 
@@ -105,14 +106,14 @@ namespace aengine
 			glGenFramebuffers(1,&fbo_onds);
 
 			onds_depth.reset(new _AEGLBuffer(width,height,GL_DEPTH_COMPONENT));
-			onds_color.reset(new _AEGLBuffer(width,height,GL_RGBA16F));
+			onds_color.reset(new _AEGLBuffer(width,height,GL_RGBA));
 			CheckError();
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,onds_depth->texture_unit,0);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,onds_color->texture_unit,0);
+			glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
+			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,onds_depth->texture_unit,0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,onds_color->texture_unit,0);
 
-			if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
+			if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
 				return AE_ERR;
 		}
 
@@ -121,82 +122,83 @@ namespace aengine
 
 	void AEGLSLRenderUnit::BlitToScreen(void)
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);	//Bind default framebuffer to blit to screen
+		// glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);	//Bind default framebuffer to blit to screen
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_onds);//fbo_post);
+		// glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_onds);//fbo_post);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glBlitFramebuffer(
-			0,0,width,height,
-			0,0,width,height,
-			GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		// glReadBuffer(GL_COLOR_ATTACHMENT0);
+		// glBlitFramebuffer(
+		// 	0,0,width,height,
+		// 	0,0,width,height,
+		// 	GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		if(use_MRT)
-		{
-			glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
+		// if(use_MRT)
+		// {
+		// 	glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
 
-			glReadBuffer(GL_COLOR_ATTACHMENT0);
-			glBlitFramebuffer(
-				0,0,width,height,
-				width*2/4+24,8,width*3/4+24,height/4+8,
-				GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		// 	glReadBuffer(GL_COLOR_ATTACHMENT0);
+		// 	glBlitFramebuffer(
+		// 		0,0,width,height,
+		// 		width*2/4+24,8,width*3/4+24,height/4+8,
+		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-			glReadBuffer(GL_COLOR_ATTACHMENT1);
-			glBlitFramebuffer(
-				0,0,width,height,
-				8,8,width/4+8,height/4+8,
-				GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		// 	glReadBuffer(GL_COLOR_ATTACHMENT1);
+		// 	glBlitFramebuffer(
+		// 		0,0,width,height,
+		// 		8,8,width/4+8,height/4+8,
+		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-			glReadBuffer(GL_COLOR_ATTACHMENT2);
-			glBlitFramebuffer(
-				0,0,width,height,
-				width/4+16,8,width*2/4+16,height/4+8,
-				GL_COLOR_BUFFER_BIT,GL_NEAREST);
-		}
+		// 	glReadBuffer(GL_COLOR_ATTACHMENT2);
+		// 	glBlitFramebuffer(
+		// 		0,0,width,height,
+		// 		width/4+16,8,width*2/4+16,height/4+8,
+		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		// }
 	}
 
 	void AEGLSLRenderUnit::PostProcess(AEObjectCamera *camera)
 	{
-		if(use_MRT)
-		{
-			glEnable(GL_DEPTH_TEST);
-			glDisable(GL_STENCIL_TEST);
-			glDisable(GL_BLEND);
+		// if(use_MRT)
+		// {
+		// 	glEnable(GL_DEPTH_TEST);
+		// 	glDisable(GL_STENCIL_TEST);
+		// 	glDisable(GL_BLEND);
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
-			GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
-			glDrawBuffers(1,draw_bufs);
+		// 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
+		// 	GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
+		// 	glDrawBuffers(1,draw_bufs);
 
-			p_post_invert->Use();
+		// 	p_post_invert->Use();
 
-			p_post_invert->BindData(
-				&this->sprite_mesh,		//mesh
-				g_color->texture_unit,	//texture
-				g_normal->texture_unit,
-				g_position->texture_unit,
-				0,
-				vec2f(width,height),	//texture size
-				vec4f(0,0,0,0),			//float data 0
-				vec4f(0,0,0,0),			//float data 1
-				&lighting_cache);
+		// 	p_post_invert->BindData(
+		// 		&this->sprite_mesh,		//mesh
+		// 		g_color->texture_unit,	//texture
+		// 		g_normal->texture_unit,
+		// 		g_position->texture_unit,
+		// 		0,
+		// 		vec2f(width,height),	//texture size
+		// 		vec4f(0,0,0,0),			//float data 0
+		// 		vec4f(0,0,0,0),			//float data 1
+		// 		&lighting_cache);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
+		// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
 
-			glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
+		// 	glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 
-			p_post_invert->UnbindData();
+		// 	p_post_invert->UnbindData();
 
-			glUseProgram(0);
-		}
+		// 	glUseProgram(0);
+		// }
 	}
 
 	int AEGLSLRenderUnit::ResizeFramebuffers(void)
 	{
-		g_color->Resize(width,height);
-		g_depth->Resize(width,height);
-		g_position->Resize(width,height);
-		g_normal->Resize(width,height);
+		// g_color->Resize(width,height);
+		// g_depth->Resize(width,height);
+		// g_position->Resize(width,height);
+		// g_normal->Resize(width,height);
 
+		return AE_OK;
 		post_color->Resize(width,height);
 
 		onds_depth->Resize(width,height);
@@ -236,6 +238,8 @@ namespace aengine
 		ver[1]=sver[2];
 		ver[2]=sver[3];
 		ver[3]='\0';
+		AEPrintLog("GLSL version:");
+		AEPrintLog(sver);
 		return atoi(ver);
 	}
 
@@ -246,8 +250,15 @@ namespace aengine
 		sv=this->pmanager.NewShader(GL_VERTEX_SHADER);
 		sf=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
 
+		char buf[1024];
+		sprintf(buf,"Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
+		AEPrintLog(buf);
+
 		if(!sv||!sf)
+		{
+			AEPrintLog("Failed to create shaders");
 			return AE_ERR;
+		}
 
 		const char **data=&_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VC_V);
 		if(*data==AE_ERR) return AE_ERR;
@@ -286,7 +297,7 @@ namespace aengine
 
 		this->p_3vc->GetShaderProperties();
 
-		char buf[1024];
+		// char buf[1024];
 		sprintf(buf,"Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
 		AEPrintLog(buf);
 		return AE_OK;

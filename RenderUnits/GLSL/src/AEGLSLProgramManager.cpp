@@ -33,12 +33,18 @@ namespace aengine
 	AEGLSLProgram *AEGLSLProgramManager::NewProgram(void)
 	{
 		AEGLSLProgram *prg=new AEGLSLProgram;
+
 		if(prg->id==0)
 		{
-			AEPrintLog("Failed to create shader object");
+			AEPrintLog("Failed to create program object");
 			delete prg;
 			return nullptr;
 		}
+
+		char buf[128];
+		sprintf(buf,"Created new program: %d",prg->id);
+		AEPrintLog(buf);
+
 		this->programs.push_back(prg);
 		return prg;
 	}
@@ -54,6 +60,17 @@ namespace aengine
 	AEGLSLShader *AEGLSLProgramManager::NewShader(uint32_t type)
 	{
 		AEGLSLShader *shd=new AEGLSLShader(type);
+
+		if(shd->id==0)
+		{
+			AEPrintLog("Failed to create shader object");
+			delete shd;
+			return nullptr;
+		}
+
+		char buf[128];
+		sprintf(buf,"Created new shader: %d",shd->id);
+		AEPrintLog(buf);
 
 		this->shaders.push_back(shd);
 		return shd;

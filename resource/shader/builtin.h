@@ -33,6 +33,7 @@ const char *_3vc_f=
 {
 "#version 100\n"
 "\n"
+"precision highp float;\n"
 "varying vec4 f_color;\n"
 "\n"
 "void main(void)\n"

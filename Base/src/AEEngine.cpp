@@ -11,6 +11,7 @@
 #include "AEDefines.h"
 #include "AERenderFactory.h"
 #include "AEWindow.h"
+#include "AEDebug.h"
 
 namespace aengine
 {
@@ -49,7 +50,7 @@ namespace aengine
 				this->render=rfactory.GetRenderUnit("GLES");
 				if(this->render==NULL)
 				{
-					puts("Incorrect RenderUnit");
+					AEPrintLog("Incorrect RenderUnit");
 					return AE_ERR;
 				}
 				if(!this->render->Init(640,480))
@@ -66,7 +67,7 @@ namespace aengine
 		}
 		if(flags&AE_INIT_SCENE)
 		{
-			puts("Scene created");
+			AEPrintLog("Scene created");
 			this->scene=new AEScene();
 
 			if(flags&AE_INIT_CAMERA)
@@ -155,14 +156,18 @@ namespace aengine
 
 	void AEEngine::i_Refresh(int *param)
 	{
+		AEPrintLog("Anim_step");
 		this->scene->animations.Step(param[0]);
 
+		AEPrintLog("CallRefresh");
 		if(this->Refresh!=NULL)
 			Refresh(param);
 
 		//TODO: Update scene
 		
+		AEPrintLog("Render");
 		this->render->Render(this->curCamera);
+		AEPrintLog("EndRender/SwapBuffers");
 		this->window->SwapBuffers();
 	}
 

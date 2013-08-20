@@ -79,7 +79,7 @@ namespace aengine
 	AEGLSLProgram3vm::AEGLSLProgram3vm(void)
 	{
 		u_istextured0.name="u_istextured0";	u_istextured0.type=GL_INT;
-		u_texture0.name	="u_texture0";		u_texture0.type=GL_UNSIGNED_INT_SAMPLER_2D;
+		u_texture0.name	="u_texture0";		//u_texture0.type=GL_UNSIGNED_INT_SAMPLER_2D;
 		a_texcoord0.name="a_texcoord0";		a_texcoord0.type=GL_FLOAT_VEC3;
 
 		texturing=true;
