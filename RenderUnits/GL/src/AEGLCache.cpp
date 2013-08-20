@@ -29,12 +29,9 @@ namespace aengine
 	//		if(!this->CacheMesh(type_cache.meshes[q].mesh->mesh)) break;
 	//	}
 	//
-		AEPrintLog("CacheMaterials");
 		this->CacheMaterials();
-		AEPrintLog("CacheFonts");
 		this->CacheFonts();
 		//FIXME: avoid of appearing light objects twice in light cache
-		AEPrintLog("BuildLightingCache");
 		this->lighting_cache.BuildCache(this->scene->objects);
 
 		this->cached=true;
@@ -44,6 +41,7 @@ namespace aengine
 	void AEGLRenderUnit::CacheClear(void)
 	{
 		// Clear buffers and buffer-index array
+		AEPrintLog("Cleaning up GL cache");
 
 		glDeleteBuffers(this->buffers.size(),&this->buffers[0]);
 		glDeleteTextures(this->textures.size(),&this->textures[0]);
@@ -61,15 +59,16 @@ namespace aengine
 
 	int AEGLRenderUnit::CacheObject(AEObject * obj)
 	{
-		AEPrintLog("Start cache object");
+		AEPrintLog("Creating cache for object: "+obj->name);
+
 		int result=AE_OK;
+
 		switch(obj->type)
 		{
 		case AE_OBJ_MESH:
 			result&=this->CacheMesh(((AEObjectMesh*)obj)->mesh);
 			break;
 		}
-		AEPrintLog("Object "+obj->name+" cached");
 
 		for(size_t q=0;q<obj->children.size();q++)
 		{
@@ -90,8 +89,6 @@ namespace aengine
 		this->textures.push_back(tex->id);
 		glBindTexture(GL_TEXTURE_2D,tex->id);
 
-		AEPrintLog("TexCreated&bound");
-
 		GLenum format=GL_RGB;
 		switch(tex->bpp)
 		{
@@ -104,7 +101,6 @@ namespace aengine
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
-		AEPrintLog("Params set");
 // #if !defined(AE_NEW_GL_CONTEXT)
 // 		glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
 // #else
@@ -113,23 +109,20 @@ namespace aengine
 
 		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex->width,tex->height,0,format,GL_UNSIGNED_BYTE,tex->data);
 
-		AEPrintLog("Data loaded");
-
 		if(glGetError()!=GL_NO_ERROR)
 			result=AE_ERR;
-
-		AEPrintLog("Texture loaded succeed");
 
 		return result;
 	}
 
 	int AEGLRenderUnit::CacheMaterials(void)
 	{
+		AEPrintLog("Caching materials");
+
 		int result=AE_OK;
 
 		for(unsigned int q=0;q<this->scene->materials.Count();q++)
 		{
-			AEPrintLog("Cache texture");
 			result=CacheTexture(this->scene->materials[q]->texture);
 			if(result!=AE_OK)
 				break;
@@ -140,6 +133,8 @@ namespace aengine
 
 	int AEGLRenderUnit::CacheFonts(void)
 	{
+		AEPrintLog("Caching fonts");
+
 		int result=AE_OK;
 
 		for(std::pair<const int,AEFontBitmap> &font:this->scene->fonts.fonts)
@@ -156,66 +151,6 @@ namespace aengine
 	{
 		if(mesh==NULL) return AE_FALSE;
 		if(mesh->cached) return AE_TRUE;
-
-		// //vertices
-		// if(mesh->vtxcount>0)
-		// {
-		// 	unsigned int buf;
-		// 	glGenBuffers(1,&buf);
-		// 	this->buffers.push_back(buf);
-		// 	mesh->idvtx=buf;
-		// 	glBindBuffer(GL_ARRAY_BUFFER,buf);
-		// 	glBufferData(GL_ARRAY_BUFFER,sizeof(AEVertexf)*mesh->vtxcount,mesh->vtx,GL_STATIC_DRAW);
-		// 	glBindBuffer(GL_ARRAY_BUFFER,0);	//Unbound buffers
-
-		// 	if(!CheckError())
-		// 		return AE_ERR;
-		// }
-
-		// //faces
-		// if(mesh->fcecount>0)
-		// {
-		// 	unsigned int buf;
-		// 	glGenBuffers(1,&buf);
-		// 	this->buffers.push_back(buf);
-		// 	mesh->idfce=buf;
-		// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,buf);
-		// 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(AETriangle)*mesh->fcecount,mesh->fce,GL_STATIC_DRAW);
-		// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);	//Unbound buffers
-
-		// 	if(!CheckError())
-		// 		return AE_ERR;
-		// }
-
-		// //texture coordinates
-		// if(mesh->tcrcount>0)
-		// {
-		// 	unsigned int buf;
-		// 	glGenBuffers(1,&buf);
-		// 	this->buffers.push_back(buf);
-		// 	mesh->idtcr=buf;
-		// 	glBindBuffer(GL_ARRAY_BUFFER,buf);
-		// 	glBufferData(GL_ARRAY_BUFFER,sizeof(AETexCoord)*mesh->tcrcount,mesh->tcr,GL_STATIC_DRAW);
-		// 	glBindBuffer(GL_ARRAY_BUFFER,0);	//Unbound buffers
-
-		// 	if(!CheckError())
-		// 		return AE_ERR;
-		// }
-
-		// //normals
-		// if(mesh->nrmcount>0)
-		// {
-		// 	unsigned int buf;
-		// 	glGenBuffers(1,&buf);
-		// 	this->buffers.push_back(buf);
-		// 	mesh->idnrm=buf;
-		// 	glBindBuffer(GL_ARRAY_BUFFER,buf);
-		// 	glBufferData(GL_ARRAY_BUFFER,sizeof(AEVector3f)*mesh->nrmcount,mesh->nrm,GL_STATIC_DRAW);
-		// 	glBindBuffer(GL_ARRAY_BUFFER,0);	//Unbound buffers
-
-		// 	if(!CheckError())
-		// 		return AE_ERR;
-		// }
 
 		mesh->cached=true;
 
@@ -296,7 +231,6 @@ namespace aengine
 			mesh->Validate(AE_UPDATE_INDEX);
 		}
 
-		//glBindBuffer(GL_ARRAY_BUFFER,0);
 		return AE_OK;
 	}
 }

@@ -17,20 +17,20 @@ namespace aengine
 {
 	AEEngine::AEEngine(void)
 	{
-		this->curCamera=NULL;
-		this->render=NULL;
-		this->window=NULL;
-		this->scene=NULL;
+		this->curCamera=nullptr;
+		this->render=nullptr;
+		this->window=nullptr;
+		this->scene=nullptr;
 
-		this->OnClose	=	NULL;
-		this->OnKeyDown	=	NULL;
-		this->OnKeyUp	=	NULL;
-		this->OnMouseDown=	NULL;
-		this->OnMouseMove=	NULL;
-		this->OnMouseUp	=	NULL;
-		this->OnResize	=	NULL;
-		this->OnStart	=	NULL;
-		this->Refresh	=	NULL;
+		this->OnClose	=	nullptr;
+		this->OnKeyDown	=	nullptr;
+		this->OnKeyUp	=	nullptr;
+		this->OnMouseDown=	nullptr;
+		this->OnMouseMove=	nullptr;
+		this->OnMouseUp	=	nullptr;
+		this->OnResize	=	nullptr;
+		this->OnStart	=	nullptr;
+		this->Refresh	=	nullptr;
 
 		memset(this->keys,0,sizeof(this->keys));
 	}
@@ -48,7 +48,7 @@ namespace aengine
 				AERenderFactory rfactory;
 
 				this->render=rfactory.GetRenderUnit("GLES");
-				if(this->render==NULL)
+				if(!this->render)
 				{
 					AEPrintLog("Incorrect RenderUnit");
 					return AE_ERR;
@@ -142,7 +142,9 @@ namespace aengine
 
 		this->render->Resize(width,height);
 
-		printf("Window resized [%d,%d];\n",width,height);
+		char buf[256];
+		sprintf(buf,"Window resized [%d,%d];\n",width,height);
+		AEPrintLog(buf);
 
 		if(this->OnResize!=NULL)
 			OnResize(param);
@@ -156,18 +158,14 @@ namespace aengine
 
 	void AEEngine::i_Refresh(int *param)
 	{
-		AEPrintLog("Anim_step");
 		this->scene->animations.Step(param[0]);
 
-		AEPrintLog("CallRefresh");
 		if(this->Refresh!=NULL)
 			Refresh(param);
 
 		//TODO: Update scene
 		
-		AEPrintLog("Render");
 		this->render->Render(this->curCamera);
-		AEPrintLog("EndRender/SwapBuffers");
 		this->window->SwapBuffers();
 	}
 

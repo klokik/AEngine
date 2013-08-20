@@ -53,7 +53,6 @@ namespace aengine
 
 	void AEWindow::CallEvent(unsigned int a_event,int param[5])
 	{
-		AEPrintLog("Call event");
 		if(!call_engine_events)
 		{
 			switch(a_event)
@@ -91,14 +90,11 @@ namespace aengine
 						(now-last_tp).count();
 					this->last_tp=now;
 
-					AEPrintLog("Call");
 					_engine->i_Refresh(param);
-					AEPrintLog("EndCall");
 					break;
 				}
 			}
 		}
-		AEPrintLog("End Call event");
 	}
 
 	int AEWindow::InitWindow(uint16_t _width, uint16_t _height, uint8_t _bpp,AE_WINDOW_TYPE _type)
@@ -122,7 +118,6 @@ namespace aengine
 		}
 		else
 		{
-			AEPrintLog("Starting window proc");
 			this->WndProc(nullptr);
 		}
 	}

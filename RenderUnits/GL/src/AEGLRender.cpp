@@ -98,37 +98,31 @@ namespace aengine
 		switch(obj->type)
 		{
 		case AE_OBJ_EMPTY:
-			//this->RenderEmpty(obj);
 			this->type_cache.empties.push_back(obj);
 			break;
 		case AE_OBJ_MESH:
-			//this->RenderMesh(dynamic_cast<AEObjectMesh*>(obj));
 			this->type_cache.meshes.push_back(obj);
-			// check if mesh is cached
-			if((dynamic_cast<AEObjectMesh*>(obj))->mesh&&!(dynamic_cast<AEObjectMesh*>(obj))->mesh->cached)
+			// check if mesh exists and is cached
+			if((static_cast<AEObjectMesh*>(obj))->mesh&&!(static_cast<AEObjectMesh*>(obj))->mesh->cached)
 				CacheObject(obj);
 			break;
 		case AE_OBJ_SPRITE:
 			if(obj->projection==AE_ORTHOGRAPHIC)
-				this->type_cache.sprites_ortho.push_back(dynamic_cast<AEObjectSprite*>(obj));
+				this->type_cache.sprites_ortho.push_back(static_cast<AEObjectSprite*>(obj));
 			else
-				this->type_cache.sprites_persp.push_back(dynamic_cast<AEObjectSprite*>(obj));
+				this->type_cache.sprites_persp.push_back(static_cast<AEObjectSprite*>(obj));
 			break;
 		case AE_OBJ_TEXT:
-			//this->RenderText(dynamic_cast<AEObjectText*>(obj));
-			this->type_cache.texts.push_back(dynamic_cast<AEObjectText*>(obj));
+			this->type_cache.texts.push_back(static_cast<AEObjectText*>(obj));
 			break;
 		case AE_OBJ_JOINT:
-			//this->RenderJoint(dynamic_cast<AEObjectJoint*>(obj));
-			this->type_cache.joints.push_back(dynamic_cast<AEObjectJoint*>(obj));
+			this->type_cache.joints.push_back(static_cast<AEObjectJoint*>(obj));
 			break;
 		// case AE_OBJ_CAMERA:
 		// 	break;
 		default:
 			this->type_cache.empties.push_back(obj);
 			//render empty for debug purposes
-			// or better render nothing
-			//this->RenderEmpty(obj);
 			break;
 		}
 
@@ -164,7 +158,7 @@ namespace aengine
 
 		if(this->scene==NULL)
 		{
-			printf("Please cache scene before usage\n");
+			AEPrintLog("Specify scene to render, or use CacheScene");
 			throw 0;
 		}
 
@@ -231,25 +225,17 @@ namespace aengine
 		case GL_NO_ERROR:
 			return AE_OK;
 		case GL_INVALID_ENUM:
-			puts("err: invalid enumeration;");
+			AEPrintLog("err: invalid enumeration;");
 			break;
 		case GL_INVALID_VALUE:
-			puts("err: invalid value;");
+			AEPrintLog("err: invalid value;");
 			break;
 		case GL_INVALID_OPERATION:
-			puts("err: invalid operation;");
+			AEPrintLog("err: invalid operation;");
 			break;
 		case GL_OUT_OF_MEMORY:
-			puts("err: out of memory;");
+			AEPrintLog("err: out of memory;");
 			break;
-#if !defined(AE_NEW_GL_CONTEXT)
-		case GL_STACK_OVERFLOW:
-			puts("err: stack underflow;");
-			break;
-		case GL_TABLE_TOO_LARGE:
-			puts("err: table too large;");
-			break;
-#endif
 		}
 		return AE_ERR;
 	}
