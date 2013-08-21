@@ -29,7 +29,7 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderEmpties(void)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER,0);//fbo_onds);
+		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 		GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
 		// glDrawBuffers(1,draw_bufs);
 

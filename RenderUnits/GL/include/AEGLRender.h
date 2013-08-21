@@ -98,8 +98,6 @@ namespace aengine
 		virtual void PopMode(void);
 		void SetFixedProjectionMatrix(void);
 
-		virtual int CheckError(void) const;
-
 		virtual unsigned int GetGLVersion(void);
 
 	public:
@@ -115,6 +113,8 @@ namespace aengine
 
 		virtual void QueueObject(AEObject *obj);
 		virtual void Render(AEObjectCamera *camera);
+
+		static int CheckError(void);
 
 		virtual ~AEGLRenderUnit(void);
 	};

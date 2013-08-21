@@ -56,13 +56,9 @@ namespace aengine
 		int result=AE_OK;
 
 		result&=this->Init3vcProgram();
-		// result&=this->Init3vmnProgram();
+		result&=this->Init3vmnProgram();
 		// result&=this->InitPostPrograms();
 
-		if(result)
-			AEPrintLog("[Done]");
-		else
-			AEPrintLog("[Fail]");
 		return result;
 	}
 
@@ -88,7 +84,6 @@ namespace aengine
 		// 	return AE_ERR;
 
 
-		return AE_OK;
 		{	//post process framebuffer
 			glGenFramebuffers(1,&fbo_post);
 
@@ -99,12 +94,18 @@ namespace aengine
 			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,post_color->texture_unit,0);
 
 			if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
+			{
+				AEPrintLog("Post process buffer incomplete");
 				return AE_ERR;
+			}
 		}
 
 		{	//ONDS framebuffer
 			glGenFramebuffers(1,&fbo_onds);
 
+			char buf[128];
+			sprintf(buf,"New framebuffers: %dx%d",width,height);
+			AEPrintLog(buf);
 			onds_depth.reset(new _AEGLBuffer(width,height,GL_DEPTH_COMPONENT));
 			onds_color.reset(new _AEGLBuffer(width,height,GL_RGBA));
 			CheckError();
@@ -113,8 +114,24 @@ namespace aengine
 			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,onds_depth->texture_unit,0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,onds_color->texture_unit,0);
 
-			if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)
+
+			switch(glCheckFramebufferStatus(GL_FRAMEBUFFER))
+			{
+			case GL_FRAMEBUFFER_COMPLETE:
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				AEPrintLog("Framebuffer incomplete attachment");
 				return AE_ERR;
+			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+				AEPrintLog("Framebuffer incomplete dimensions");
+				return AE_ERR;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				AEPrintLog("Framebuffer missing attachment");
+				return AE_ERR;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				AEPrintLog("Framebuffer unsupported");
+				return AE_ERR;
+			}
 		}
 
 		return AE_OK;
@@ -122,38 +139,40 @@ namespace aengine
 
 	void AEGLSLRenderUnit::BlitToScreen(void)
 	{
-		// glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);	//Bind default framebuffer to blit to screen
+#if !defined(BUILD_GLES_RENDER)
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);	//Bind default framebuffer to blit to screen
 
-		// glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_onds);//fbo_post);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_onds);//fbo_post);
 
-		// glReadBuffer(GL_COLOR_ATTACHMENT0);
-		// glBlitFramebuffer(
-		// 	0,0,width,height,
-		// 	0,0,width,height,
-		// 	GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glBlitFramebuffer(
+			0,0,width,height,
+			0,0,width,height,
+			GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		// if(use_MRT)
-		// {
-		// 	glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
+		if(use_MRT)
+		{
+			glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo_gbuffer);
 
-		// 	glReadBuffer(GL_COLOR_ATTACHMENT0);
-		// 	glBlitFramebuffer(
-		// 		0,0,width,height,
-		// 		width*2/4+24,8,width*3/4+24,height/4+8,
-		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
+			glReadBuffer(GL_COLOR_ATTACHMENT0);
+			glBlitFramebuffer(
+				0,0,width,height,
+				width*2/4+24,8,width*3/4+24,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		// 	glReadBuffer(GL_COLOR_ATTACHMENT1);
-		// 	glBlitFramebuffer(
-		// 		0,0,width,height,
-		// 		8,8,width/4+8,height/4+8,
-		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
+			glReadBuffer(GL_COLOR_ATTACHMENT1);
+			glBlitFramebuffer(
+				0,0,width,height,
+				8,8,width/4+8,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
 
-		// 	glReadBuffer(GL_COLOR_ATTACHMENT2);
-		// 	glBlitFramebuffer(
-		// 		0,0,width,height,
-		// 		width/4+16,8,width*2/4+16,height/4+8,
-		// 		GL_COLOR_BUFFER_BIT,GL_NEAREST);
-		// }
+			glReadBuffer(GL_COLOR_ATTACHMENT2);
+			glBlitFramebuffer(
+				0,0,width,height,
+				width/4+16,8,width*2/4+16,height/4+8,
+				GL_COLOR_BUFFER_BIT,GL_NEAREST);
+		}
+#endif
 	}
 
 	void AEGLSLRenderUnit::PostProcess(AEObjectCamera *camera)
@@ -198,7 +217,6 @@ namespace aengine
 		// g_position->Resize(width,height);
 		// g_normal->Resize(width,height);
 
-		return AE_OK;
 		post_color->Resize(width,height);
 
 		onds_depth->Resize(width,height);
@@ -260,12 +278,12 @@ namespace aengine
 			return AE_ERR;
 		}
 
-		const char **data=&_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VC_V);
+		const char *data=_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VC_V);
 		if(*data==AE_ERR) return AE_ERR;
-		sv->ShaderData(data,1,NULL);
-		data=&_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VC_F);
+		sv->ShaderData(&data,1,NULL);
+		data=_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VC_F);
 		if(*data==AE_ERR) return AE_ERR;
-		sf->ShaderData(data,1,NULL);
+		sf->ShaderData(&data,1,NULL);
 
 		//Vertex shader
 		sv->Compile();
@@ -310,12 +328,12 @@ namespace aengine
 		sv_mesh=this->pmanager.NewShader(GL_VERTEX_SHADER);
 		sf_mesh=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
 
-		const char **data=AEReadTextFileCml(AEGLSL_PATH_3VMN_V);
+		const char *data=_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VMN_V);
 		if(*data==AE_ERR) return AE_ERR;
-		sv_mesh->ShaderData(data,1,NULL);
-		data=AEReadTextFileCml(AEGLSL_PATH_3VMN_F);
+		sv_mesh->ShaderData(&data,1,NULL);
+		data=_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VMN_F);
 		if(*data==AE_ERR) return AE_ERR;
-		sf_mesh->ShaderData(data,1,NULL);
+		sf_mesh->ShaderData(&data,1,NULL);
 
 		//Vertex shader
 		sv_mesh->Compile();

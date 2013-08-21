@@ -27,8 +27,6 @@ namespace aengine
 
 	void AEGLSLShader::ShaderData(const char **str, uint32_t count, const int *length)
 	{
-		AEPrintLog("load shader: ");
-		AEPrintLog(*str);
 		glShaderSource(this->id,count,str,length);
 	}
 

@@ -7,11 +7,11 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "AEGLHeader.h"
 #include "AEDefines.h"
 #include "AEGLRender.h"
+#include "AEDebug.h"
 
 
 namespace aengine
@@ -216,7 +216,7 @@ namespace aengine
 #endif
 	}
 
-	int AEGLRenderUnit::CheckError(void) const
+	int AEGLRenderUnit::CheckError(void)
 	{
 		GLenum err=glGetError();
 

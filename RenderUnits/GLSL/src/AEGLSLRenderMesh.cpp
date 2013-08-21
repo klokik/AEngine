@@ -46,7 +46,7 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderMeshes(void)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER,0);//fbo_gbuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);//fbo_gbuffer);
 		// GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2};
 		// glDrawBuffers(3,draw_bufs);
 

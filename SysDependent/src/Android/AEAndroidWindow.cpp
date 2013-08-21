@@ -139,9 +139,34 @@ namespace aengine
 
 	int32_t AEAndroidWindow::HandleInput(struct android_app *app,AInputEvent *event)
 	{
+		AEAndroidWindow *wnd=static_cast<AEAndroidWindow*>(app->userData);
+
 		if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_MOTION)
 		{
-			LOGI("Motion input");
+			float x=AMotionEvent_getX(event,0);
+			float y=AMotionEvent_getY(event,0);
+
+			static float last_x=x;
+			static float last_y=y;
+
+			int param[]={
+				(int)x,
+				(int)(wnd->height-y),
+				(int)(x-last_x),
+				-(int)(y-last_y),
+				2
+			};
+			last_x=x;
+			last_y=y;
+
+			if((AMOTION_EVENT_ACTION_DOWN|AMOTION_EVENT_ACTION_POINTER_DOWN)&AMotionEvent_getAction(event))
+			{
+				param[2]=2;
+				param[3]=0;
+				wnd->CallEvent(AE_EVENT_MOUSEDOWN,param);
+			}
+			if(AMotionEvent_getAction(event)&AMOTION_EVENT_ACTION_MOVE)
+				wnd->CallEvent(AE_EVENT_MOUSEMOVE,param);
 		}
 		else if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_KEY)
 		{
@@ -154,6 +179,7 @@ namespace aengine
 	{
 		AEAndroidWindow *wnd=static_cast<AEAndroidWindow*>(app->userData);
 
+		int param[5]={0};
 		switch(cmd)
 		{
 		case APP_CMD_SAVE_STATE:
@@ -172,7 +198,6 @@ namespace aengine
 				if(!wnd->InitDisplay())
 				{
 					LOGW("Display init FAILED");
-					return AE_ERR;
 				}
 				if(wnd->first_init_call)
 				{
@@ -194,6 +219,23 @@ namespace aengine
 			wnd->active=false;
 			LOGI("cmd: Window lost focus");
 			break;
+		case APP_CMD_WINDOW_RESIZED:
+			break;
+		case APP_CMD_CONFIG_CHANGED:
+			break;
+		}
+
+		if(wnd->active)
+		{
+			int32_t new_width=ANativeWindow_getWidth(wnd->a_app->window);
+			int32_t new_height=ANativeWindow_getHeight(wnd->a_app->window);
+			if(wnd->width!=new_width||wnd->height!=new_height)
+			{
+				LOGI("cmd: Window resized");
+				param[0]=wnd->width=new_width;
+				param[1]=wnd->height=new_height;
+				wnd->CallEvent(AE_EVENT_RESIZE,param);
+			}
 		}
 	}
 
@@ -217,7 +259,7 @@ namespace aengine
 		EGLint minor_version;
 
 		eglInitialize(display,&major_version,&minor_version);
-		LOGI("EGL %i.%i",major_version,minorVersion);
+		LOGI("EGL %i.%i",major_version,minor_version);
 
 		//query num of configs
 		int num_conf=0;

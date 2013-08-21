@@ -18,6 +18,13 @@ namespace aengine
 	class AEGLESRenderUnit: public AEGLSLRenderUnit
 	{
 	protected:
+		AEGLSLProgram2vsquare *p_blit;
+
+		virtual void BlitToScreen(void) override;
+
+		virtual int InitPrograms(void);
+		virtual int InitBlitProgram(void);
+
 	public:
 		AEGLESRenderUnit(void);
 
