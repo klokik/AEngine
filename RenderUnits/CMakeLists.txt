@@ -1,6 +1,6 @@
 option(BUILD_GL_RENDER "Desktop OpenGL 1.4 render unit" ON)
 option(BUILD_GLSL_RENDER "Desktop OpenGL 2.1+ render unit" ON)
-option(BUILD_GLES_RENDER "Mobile OpenGLES 2.0+ render unit" OFF)
+option(BUILD_GLES_RENDER "Mobile OpenGLES 2.0+ render unit" ON)
 
 message("Build GL: ${BUILD_GL_RENDER}")
 message("Build GLSL: ${BUILD_GLSL_RENDER}")
