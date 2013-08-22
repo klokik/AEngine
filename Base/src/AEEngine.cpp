@@ -73,6 +73,7 @@ namespace aengine
 			if(flags&AE_INIT_CAMERA)
 			{
 				this->curCamera=new AEObjectCamera;
+				this->curCamera->name="BasicCamera";
 				this->scene->AddObject(this->curCamera);
 			}
 		}
