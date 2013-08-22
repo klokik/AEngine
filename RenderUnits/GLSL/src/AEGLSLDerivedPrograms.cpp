@@ -71,8 +71,13 @@ namespace aengine
 
 	void AEGLSLProgram3vc::UnbindData(void)
 	{
-		glDisableVertexAttribArray(a_vertex.id);
-		if(a_color.id!=-1)
+		int result;
+		glGetVertexAttribiv(a_vertex.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+		if(result)
+			glDisableVertexAttribArray(a_vertex.id);
+
+		glGetVertexAttribiv(a_color.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+		if(result)
 			glDisableVertexAttribArray(a_color.id);
 	}
 
@@ -135,7 +140,7 @@ namespace aengine
 			}
 		}
 
-		// glBindBuffer(GL_ARRAY_BUFFER,0);
+		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		glUniform1i(u_istextured0.id,0);
 		return true;	//Return true if geometry is OK
@@ -144,9 +149,11 @@ namespace aengine
 	void AEGLSLProgram3vm::UnbindData(void)
 	{
 		AEGLSLProgram3vc::UnbindData();
-		glDisableVertexAttribArray(a_texcoord0.id);
-		// Useless stuff
-		// glDisable(GL_TEXTURE_2D);
+
+		int result;
+		glGetVertexAttribiv(a_texcoord0.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+		if(result)
+			glDisableVertexAttribArray(a_texcoord0.id);
 	}
 
 	AEGLSLProgram3vmn::AEGLSLProgram3vmn(void)
@@ -170,7 +177,7 @@ namespace aengine
 		if(!AEGLSLProgram3vm::BindData(object,camera,projection,mesh,mat))
 			return false;
 
-		if(a_normal.id!=-1&&mesh->idnrm)
+		if(a_normal.id!=-1&&mesh->nrmcount)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER,mesh->idnrm);
 			glVertexAttribPointer(a_normal.id,3,GL_FLOAT,GL_FALSE,sizeof(AEVector3f),0);
@@ -183,7 +190,11 @@ namespace aengine
 	void AEGLSLProgram3vmn::UnbindData(void)
 	{
 		AEGLSLProgram3vm::UnbindData();
-		glDisableVertexAttribArray(a_normal.id);
+
+		int result;
+		glGetVertexAttribiv(a_normal.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+		if(result)
+			glDisableVertexAttribArray(a_normal.id);
 	}
 
 	AEGLSLProgram3vmnl::AEGLSLProgram3vmnl(void)
@@ -200,9 +211,9 @@ namespace aengine
 
 	void AEGLSLProgram3vmnl::GetShaderProperties(void)
 	{
-		AEGLSLProgram3vm::GetShaderProperties();
+		AEGLSLProgram3vmn::GetShaderProperties();
 		printf("object_mat -> %d;\ncamera_mat -> %d;\n",u_object_matrix.id,u_camera_matrix.id);
-		this->GetAttribute(a_normal);
+		// this->GetAttribute(a_normal);
 
 		this->GetUniform(u_shaded);
 		this->GetUniform(u_lights_type);
@@ -248,15 +259,12 @@ namespace aengine
 		glUniform3fv(u_lights_attenuation.id,cnt,(const GLfloat*)&lcache->arr_attenuation[0]);
 		glUniform2fv(u_lights_spot.id,cnt,(const GLfloat*)&lcache->arr_spot[0]);
 
-		// WTF???
-		// glLoadMatrixf(object.ToArray());
 		return true;
 	}
 
 	void AEGLSLProgram3vmnl::UnbindData(void)
 	{
-		AEGLSLProgram3vm::UnbindData();
-		glDisableVertexAttribArray(a_normal.id);
+		AEGLSLProgram3vmn::UnbindData();
 	}
 
 	AEGLSLProgram2vsquare::AEGLSLProgram2vsquare(void)

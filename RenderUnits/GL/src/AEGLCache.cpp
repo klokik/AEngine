@@ -66,8 +66,18 @@ namespace aengine
 		switch(obj->type)
 		{
 		case AE_OBJ_MESH:
-			result&=this->CacheMesh(((AEObjectMesh*)obj)->mesh);
+			AEPrintLog("\ttype: mesh");
+			try
+			{
+				result&=this->CacheMesh(dynamic_cast<AEObjectMesh*>(obj)->mesh);
+			}
+			catch(...)
+			{
+				AEPrintLog("\t\x1B[31m[FAILED]");
+			}
 			break;
+		default:
+			AEPrintLog("\ttype: dont-care");
 		}
 
 		for(size_t q=0;q<obj->children.size();q++)
@@ -149,7 +159,10 @@ namespace aengine
 
 	int AEGLRenderUnit::CacheMesh(AEMesh * mesh)
 	{
-		if(mesh==NULL) return AE_FALSE;
+		if(mesh==nullptr) return AE_FALSE;
+		char buf[128];
+		sprintf(buf,"\t mesh present %d",mesh);
+		AEPrintLog(buf);
 		if(mesh->cached) return AE_TRUE;
 
 		mesh->cached=true;

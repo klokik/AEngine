@@ -27,6 +27,7 @@ namespace aengine
 		AEGLSLProgramManager pmanager;
 
 		AEGLSLProgram3vc	*p_3vc;
+		AEGLSLProgram3vm	*p_3vm;
 		AEGLSLProgram3vmn	*p_3vmn;
 		// AEGLSLProgram3vctnl *p_3vctnl;
 
@@ -68,12 +69,20 @@ namespace aengine
 
 		virtual unsigned int GetGLSLVersion(void);
 
+		virtual void ClearFramebuffers(void);
+
 		virtual void RenderEmpty(AEObject * obj);
 		virtual void RenderMesh(AEObjectMesh * obj);
 
-		virtual void RenderMeshes(void);
-		virtual void RenderEmpties(void);
+		virtual void RenderText(AEObjectText *obj) override;
 
+		virtual void RenderMeshes(void) override;
+		virtual void RenderEmpties(void) override;
+
+		virtual void RenderSpritesPersp(void) override;
+		virtual void RenderSpritesOrtho(void) override;
+
+		virtual void RenderTexts(void) override;
 	//	virtual void RenderSpritePersp(const AESpriteObject & obj);
 	//	virtual void RenderSpritesOrtho(void);
 

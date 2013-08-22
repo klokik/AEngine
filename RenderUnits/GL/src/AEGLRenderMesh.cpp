@@ -72,4 +72,17 @@ namespace aengine
 		}
 	}
 }
+#else
+namespace aengine
+{
+	void AEGLRenderUnit::RenderMesh(AEObjectMesh * obj)
+	{
+		// nop
+	}
+
+	void AEGLRenderUnit::RenderMeshes(void)
+	{
+		// nop
+	}
+}
 #endif /* !AE_NEW_GL_CONTEXT */

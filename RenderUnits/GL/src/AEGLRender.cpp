@@ -179,14 +179,14 @@ namespace aengine
 			glEnable(GL_DEPTH_TEST);
 		}
 
-		// this->RenderMeshes();
+		this->RenderMeshes();
 		this->RenderEmpties();
 		this->RenderJoints();
 
-		// this->RenderSpritesPersp();
-		// this->RenderSpritesOrtho();
+		this->RenderSpritesPersp();
+		this->RenderSpritesOrtho();
 
-		// this->RenderTexts();
+		this->RenderTexts();
 	}
 
 	void AEGLRenderUnit::Set2DMode(void)

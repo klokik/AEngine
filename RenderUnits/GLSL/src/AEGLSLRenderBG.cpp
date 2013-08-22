@@ -33,7 +33,6 @@ namespace aengine
 		GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
 		// glDrawBuffers(1,draw_bufs);
 
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
 		for(size_t q=0;q<type_cache.empties.size();q++)

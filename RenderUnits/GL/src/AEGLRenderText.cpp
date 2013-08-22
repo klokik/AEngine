@@ -91,4 +91,10 @@ namespace aengine
 		}
 	}
 }
+#else
+namespace aengine
+{
+	void AEGLRenderUnit::RenderText(AEObjectText *obj) {}
+	void AEGLRenderUnit::RenderTexts(void) {}
+}
 #endif /* !AE_NEW_GL_CONTEXT */

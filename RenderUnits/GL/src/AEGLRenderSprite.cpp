@@ -102,4 +102,10 @@ namespace aengine
 		glDisableClientState(GL_NORMAL_ARRAY);
 	}
 }
+#else
+namespace aengine
+{
+	void AEGLRenderUnit::RenderSpritesPersp(void) {};
+	void AEGLRenderUnit::RenderSpritesOrtho(void) {};
+}
 #endif /* !AE_NEW_GL_CONTEXT */

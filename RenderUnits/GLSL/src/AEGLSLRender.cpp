@@ -57,6 +57,8 @@ namespace aengine
 
 		result&=this->Init3vcProgram();
 		result&=this->Init3vmnProgram();
+
+		p_3vm=static_cast<AEGLSLProgram3vm*>(p_3vmn);
 		// result&=this->InitPostPrograms();
 
 		return result;
@@ -328,7 +330,7 @@ namespace aengine
 		sv_mesh=this->pmanager.NewShader(GL_VERTEX_SHADER);
 		sf_mesh=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
 
-		const char *data=_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VMN_V);
+		const char *data=_3vmn_v;//AEReadTextFileCml(AEGLSL_PATH_3VMN_V);
 		if(*data==AE_ERR) return AE_ERR;
 		sv_mesh->ShaderData(&data,1,NULL);
 		data=_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VMN_F);
@@ -418,8 +420,19 @@ namespace aengine
 		return AE_OK;
 	}
 
+	void AEGLSLRenderUnit::ClearFramebuffers(void)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		glBindFramebuffer(GL_FRAMEBUFFER,fbo_post);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
 	void AEGLSLRenderUnit::Render(AEObjectCamera *camera)
 	{
+		ClearFramebuffers();
+
 		AEGLRenderUnit::Render(camera);
 
 		PostProcess(camera);
