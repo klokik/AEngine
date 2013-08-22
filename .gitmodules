@@ -1,3 +1,3 @@
 [submodule "Plugins/ImageLoader/extra/libpng"]
 	path = Plugins/ImageLoader/extra/libpng
-	url = https://github.com/julienr/libpng-android.git
+	url = git@github.com:klokik/libpng-android.git
