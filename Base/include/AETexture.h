@@ -30,4 +30,6 @@ typedef struct
 	void *data;
 }AETexture;
 
+typedef AETexture AEImage;
+
 #endif /* AETEXTURE_H_ */

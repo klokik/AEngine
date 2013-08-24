@@ -39,8 +39,8 @@ int AEFontManager::LoadFont(const char *filename,const char *name,uint width,uin
 	font.name=name;
 
 	// if(material_manager->LoadTexture(font.texture,filename)<=0) return 0;
-	font.texture=malloc(sizeof(AETexture));
-	ResourceManager::LoadImage(filename,*font.texture,"png");
+	font.texture=static_cast<AETexture*>(malloc(sizeof(AETexture)));
+	aengine::AEResourceManager::LoadImage(filename,*font.texture,"png");
 
 	return this->AddFont(font);
 }

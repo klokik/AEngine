@@ -31,8 +31,8 @@ public:
 	size_t Count() const;
 
 	// int LoadTexture(AETexture *&tex,const char *filename);
-	void OptimizeTexture(AETexture *tex);
-	void FreeTexture(AETexture *tex);
+	void OptimizeTexture(AETexture *&tex);
+	void FreeTexture(AETexture *&tex);
 
 	virtual ~AEMaterialManager(void);
 };

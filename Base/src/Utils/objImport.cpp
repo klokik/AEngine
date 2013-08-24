@@ -16,7 +16,7 @@
 #include "AEUnits.h"
 #include "AEMesh.h"
 
-void LoadObjFile(AEMesh *&mesh, const char *path)
+void LoadObjFile(AEMesh &mesh, const char *path)
 {
 	FILE *f;
 	f=fopen(path,"r");
@@ -30,8 +30,6 @@ void LoadObjFile(AEMesh *&mesh, const char *path)
 		std::vector<AETriangle> vfce;
 		std::vector<AETexCoord> vtcr;
 		std::vector<AEVector3f> vnrm;
-
-		// mesh=new AEMesh;
 
 		bool ffirst=true;
 		bool unorm=false;
@@ -92,15 +90,15 @@ void LoadObjFile(AEMesh *&mesh, const char *path)
 					if(ffirst)
 					{
 						ffirst=false;
-						if(vvtx.size()) mesh->vtx=(AEVertexf*)malloc(sizeof(AEVertexf)*vvtx.size());
-						if(vtcr.size()) mesh->tcr=(AETexCoord*)malloc(sizeof(AETexCoord)*vvtx.size());
-						if(vnrm.size()) mesh->nrm=(AEVector3f*)malloc(sizeof(AEVector3f)*vvtx.size());
+						if(vvtx.size()) mesh.vtx=(AEVertexf*)malloc(sizeof(AEVertexf)*vvtx.size());
+						if(vtcr.size()) mesh.tcr=(AETexCoord*)malloc(sizeof(AETexCoord)*vvtx.size());
+						if(vnrm.size()) mesh.nrm=(AEVector3f*)malloc(sizeof(AEVector3f)*vvtx.size());
 
-						mesh->vtxcount=vvtx.size();
-						mesh->tcrcount=vvtx.size();
-						mesh->nrmcount=vvtx.size();
+						mesh.vtxcount=vvtx.size();
+						mesh.tcrcount=vvtx.size();
+						mesh.nrmcount=vvtx.size();
 
-						memcpy(mesh->vtx,&vvtx[0],sizeof(AEVertexf)*vvtx.size());
+						memcpy(mesh.vtx,&vvtx[0],sizeof(AEVertexf)*vvtx.size());
 					}
 
 					AETriangle fce;
@@ -135,16 +133,16 @@ void LoadObjFile(AEMesh *&mesh, const char *path)
 
 						if(utcr)
 						{
-							mesh->tcr[A]=vtcr[tcrid[0]];
-							mesh->tcr[B]=vtcr[tcrid[1]];
-							mesh->tcr[C]=vtcr[tcrid[2]];
+							mesh.tcr[A]=vtcr[tcrid[0]];
+							mesh.tcr[B]=vtcr[tcrid[1]];
+							mesh.tcr[C]=vtcr[tcrid[2]];
 						}
 
 						if(unorm)
 						{
-							mesh->nrm[A]=vnrm[nrmid[0]];
-							mesh->nrm[B]=vnrm[nrmid[1]];
-							mesh->nrm[C]=vnrm[nrmid[2]];
+							mesh.nrm[A]=vnrm[nrmid[0]];
+							mesh.nrm[B]=vnrm[nrmid[1]];
+							mesh.nrm[C]=vnrm[nrmid[2]];
 						}
 					}
 //						int id,idn;
@@ -202,11 +200,11 @@ void LoadObjFile(AEMesh *&mesh, const char *path)
 
 		size_t size=sizeof(AETriangle)*vfce.size();
 		void *mem=malloc(size);
-		mesh->fce=(AETriangle*)mem;
-		memcpy(mesh->fce,&vfce[0],size);
-		mesh->fcecount=vfce.size();
+		mesh.fce=(AETriangle*)mem;
+		memcpy(mesh.fce,&vfce[0],size);
+		mesh.fcecount=vfce.size();
 
-		printf("Vertex: %d;\nFace: %d\nNormals: %d\nTexCoords: %d\n",mesh->vtxcount,mesh->fcecount,mesh->nrmcount,mesh->tcrcount);
+		printf("Vertex: %d;\nFace: %d\nNormals: %d\nTexCoords: %d\n",mesh.vtxcount,mesh.fcecount,mesh.nrmcount,mesh.tcrcount);
 		fclose(f);
 	}
 }

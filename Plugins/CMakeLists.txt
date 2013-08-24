@@ -10,3 +10,8 @@ if(BUILD_COLLADA)
 	add_subdirectory(COLLADA)
 endif()
 
+option(BUILD_RES_MANAGER "Use resource manager (required)" ON)
+message("Build ResourceManager: ${BUILD_RES_MANAGER}")
+if(BUILD_RES_MANAGER)
+	add_subdirectory(ResourceManager)
+endif()

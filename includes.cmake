@@ -8,6 +8,7 @@ set(INCLUDES ${INCLUDES}
 	SysDependent/include
 	Plugins/AEVision/include
 	Plugins/COLLADA/include
+	Plugins/ResourceManager/include
 	/usr/include/collada-dom2.4/
 	# /usr/include/collada-dom2.4/1.4/
 	/usr/include/collada-dom2.4/1.5/)
