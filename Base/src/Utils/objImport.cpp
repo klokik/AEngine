@@ -31,7 +31,7 @@ void LoadObjFile(AEMesh *&mesh, const char *path)
 		std::vector<AETexCoord> vtcr;
 		std::vector<AEVector3f> vnrm;
 
-		mesh=new AEMesh;
+		// mesh=new AEMesh;
 
 		bool ffirst=true;
 		bool unorm=false;

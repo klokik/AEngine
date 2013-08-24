@@ -30,7 +30,7 @@ public:
 	AEMaterial *operator[](size_t id) const;
 	size_t Count() const;
 
-	int LoadTexture(AETexture *&tex,const char *filename);
+	// int LoadTexture(AETexture *&tex,const char *filename);
 	void OptimizeTexture(AETexture *tex);
 	void FreeTexture(AETexture *tex);
 

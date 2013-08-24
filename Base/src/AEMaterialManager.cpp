@@ -40,55 +40,55 @@ AEMaterial *AEMaterialManager::New(void)
 	return mat;
 }
 
-int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
-{
-	// if(!this->IMGinit)
-	// {
-	// 	if(!IMG_Init(IMG_INIT_PNG|IMG_INIT_JPG))
-	// 		return -1;
-	// 		else IMGinit=true;
-	// }
+// int AEMaterialManager::LoadTexture(AETexture *&tex,const char *filename)
+// {
+// 	// if(!this->IMGinit)
+// 	// {
+// 	// 	if(!IMG_Init(IMG_INIT_PNG|IMG_INIT_JPG))
+// 	// 		return -1;
+// 	// 		else IMGinit=true;
+// 	// }
 
-//	SDL_Surface *surf=IMG_Load(filename);
+// //	SDL_Surface *surf=IMG_Load(filename);
 
-//	if(!surf) return -2;
+// //	if(!surf) return -2;
 
-	if(tex)
-	{
-		if(tex->size>0)
-			free(tex->data);
-	}
-	else
-		tex=(AETexture*)malloc(sizeof(AETexture));
+// 	if(tex)
+// 	{
+// 		if(tex->size>0)
+// 			free(tex->data);
+// 	}
+// 	else
+// 		tex=(AETexture*)malloc(sizeof(AETexture));
 
-	tex->width=256;//surf->w;
-	tex->height=256;//surf->h;
+// 	tex->width=256;//surf->w;
+// 	tex->height=256;//surf->h;
 
-	//tex.pixelformat=surf->format;
-	tex->bpp=32;//surf->pitch/surf->w*8;
-	tex->size=tex->width*tex->height*tex->bpp/8;//surf->pitch*surf->h;
+// 	//tex.pixelformat=surf->format;
+// 	tex->bpp=32;//surf->pitch/surf->w*8;
+// 	tex->size=tex->width*tex->height*tex->bpp/8;//surf->pitch*surf->h;
 
-	tex->data=malloc(tex->size);
-	//copy and flip texture vertically
-//	memcpy(tex->data,surf->pixels,tex->size);
-	// for(size_t q=0;q<surf->h;q++)
-	// {
-		// memcpy(tex->data+q*surf->w,surf->pixels+q*surf->w,surf->w);
-	// }
-	// size_t bypp = tex->bpp/8;
-	// for(size_t q=0;q<tex->size;q+=bypp)
-	// {
-	// 	((uint8_t*)tex->data)[q]=((uint8_t*)surf->pixels)[tex->size-q-1-2];
-	// 	((uint8_t*)tex->data)[q+1]=((uint8_t*)surf->pixels)[tex->size-q-1-1];
-	// 	((uint8_t*)tex->data)[q+2]=((uint8_t*)surf->pixels)[tex->size-q-1];
-	// }
+// 	tex->data=malloc(tex->size);
+// 	//copy and flip texture vertically
+// //	memcpy(tex->data,surf->pixels,tex->size);
+// 	// for(size_t q=0;q<surf->h;q++)
+// 	// {
+// 		// memcpy(tex->data+q*surf->w,surf->pixels+q*surf->w,surf->w);
+// 	// }
+// 	// size_t bypp = tex->bpp/8;
+// 	// for(size_t q=0;q<tex->size;q+=bypp)
+// 	// {
+// 	// 	((uint8_t*)tex->data)[q]=((uint8_t*)surf->pixels)[tex->size-q-1-2];
+// 	// 	((uint8_t*)tex->data)[q+1]=((uint8_t*)surf->pixels)[tex->size-q-1-1];
+// 	// 	((uint8_t*)tex->data)[q+2]=((uint8_t*)surf->pixels)[tex->size-q-1];
+// 	// }
 
-//	SDL_FreeSurface(surf);
+// //	SDL_FreeSurface(surf);
 
-	printf("Texture loaded %dx%d\n",tex->width,tex->height);
+// 	printf("Texture loaded %dx%d\n",tex->width,tex->height);
 
-	return 1;
-}
+// 	return 1;
+// }
 
 AEMaterial *AEMaterialManager::operator[](size_t id) const
 {
@@ -106,17 +106,17 @@ void AEMaterialManager::Delete(AEMaterial *mat)
 	//TODO:Remove material from list
 }
 
-void AEMaterialManager::OptimizeTexture(AETexture *tex)
+void AEMaterialManager::OptimizeTexture(AETexture *&tex)
 {
 	if(tex==NULL) return;
 	if(tex->size>0) { free(tex->data); tex->size=0; }
 }
 
-void AEMaterialManager::FreeTexture(AETexture *tex)
+void AEMaterialManager::FreeTexture(AETexture *&tex)
 {
-	if(tex==NULL) return;
-	if(tex->size>0) { free(tex->data); tex->size=0; }
+	this->OptimizeTexture(tex);
 	free(tex);	//use carefull
+	tex=nullptr;
 }
 
 AEMaterialManager::~AEMaterialManager(void)

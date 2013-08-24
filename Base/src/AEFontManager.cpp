@@ -6,6 +6,8 @@
  */
 
 #include "AEFontManager.h"
+#include "AEResourceManager.h"
+
 
 AEFontManager::AEFontManager(AEMaterialManager* mat)
 {
@@ -28,7 +30,7 @@ int AEFontManager::AddFont(AEFontBitmap font)
 
 int AEFontManager::LoadFont(const char *filename,const char *name,uint width,uint height)
 {
-	if(!material_manager||!filename) return 0;
+	if(!filename) return 0;
 
 	AEFontBitmap font;
 	font.width=width;
@@ -36,7 +38,9 @@ int AEFontManager::LoadFont(const char *filename,const char *name,uint width,uin
 	font.texture=NULL;
 	font.name=name;
 
-	if(material_manager->LoadTexture(font.texture,filename)<=0) return 0;
+	// if(material_manager->LoadTexture(font.texture,filename)<=0) return 0;
+	font.texture=malloc(sizeof(AETexture));
+	ResourceManager::LoadImage(filename,*font.texture,"png");
 
 	return this->AddFont(font);
 }
