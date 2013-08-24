@@ -5,12 +5,7 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-
+#include "AEGLHeader.h"
 #include "AEGLSLRender.h"
 
 
@@ -34,11 +29,10 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderEmpties(void)
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
+		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 		GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1,draw_bufs);
+		// glDrawBuffers(1,draw_bufs);
 
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
 		for(size_t q=0;q<type_cache.empties.size();q++)

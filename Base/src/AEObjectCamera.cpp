@@ -15,6 +15,10 @@ AEObjectCamera::AEObjectCamera(void)
 
 	this->angle=45.0f;
 	this->focus=0.0f;
+	this->z_near=0.1f;
+	this->z_far=100.0f;
+
+	this->InvalidateProjection();
 }
 
 //force means that complete path from root element will be recalculated (not implemented yet)
@@ -40,6 +44,36 @@ void AEObjectCamera::CalculateCameraMatrix(bool force)
 			node->CalculateCameraMatrix(force);
 		root_path.pop();
 	}while(!root_path.empty());
+}
+
+void AEObjectCamera::CalculateProjectionMatrix(bool force)
+{
+	if(pmn_recalc||force)
+	{
+		float r=z_near/tan(angle/2);
+		float t=r/ratio;
+
+		float p_mtx[16]={
+			z_near/r, 0,0,0,
+			0, z_near/t, 0,0,
+			0,0,-(z_far+z_near)/(z_far-z_near),-1,
+			0,0,-2*z_far*z_near/(z_far-z_near),0
+		};
+		pmatrix=p_mtx;
+
+		pmn_recalc=false;
+	}
+}
+
+const AEMatrix4f4 &AEObjectCamera::GetProjectionMatrix(void)
+{
+	this->CalculateProjectionMatrix();
+	return this->pmatrix;
+}
+
+void AEObjectCamera::InvalidateProjection(void)
+{
+	pmn_recalc=true;
 }
 
 void AEObjectCamera::LookAt(AEVector3f point,AEVector3f normal)

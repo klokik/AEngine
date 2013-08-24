@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=../android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=9 \
+# cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=18 \
  -DANDROID_STL=gnustl_static \
  -DTARGET_PLATFORM="Android" \
- -DBUILD_GL_RENDER=OFF -DBUILD_GLSL_RENDER=OFF -DBUILD_GLES_RENDER=ON ../../../
-cd ..
+ -DBUILD_GL_RENDER=ON -DBUILD_GLSL_RENDER=ON -DBUILD_GLES_RENDER=ON ../../
+# cd ..
 

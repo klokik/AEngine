@@ -20,7 +20,7 @@ public:
 	AEMatrixStack(void);
 
 	void PushMatrix(void);
-	void PopMartix(void);
+	void PopMatrix(void);
 	size_t GetDepth(void);
 	void Clear(void);
 	bool IsEmpty(void);

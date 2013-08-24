@@ -7,6 +7,7 @@
 
 #include "AEWindow.h"
 #include "AEEngine.h"
+#include "AEDebug.h"
 
 namespace aengine
 {
@@ -111,9 +112,14 @@ namespace aengine
 		this->last_tp=std::chrono::system_clock::now();
 
 		if(async)
+		{
 			pthread_create(&thread,nullptr,RunWndProc,static_cast<void*>(this));
+			AEPrintLog("Window started in a new thread");
+		}
 		else
+		{
 			this->WndProc(nullptr);
+		}
 	}
 
 	void AEWindow::Stop(void)

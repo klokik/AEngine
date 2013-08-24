@@ -11,25 +11,26 @@
 #include "AEDefines.h"
 #include "AERenderFactory.h"
 #include "AEWindow.h"
+#include "AEDebug.h"
 
 namespace aengine
 {
 	AEEngine::AEEngine(void)
 	{
-		this->curCamera=NULL;
-		this->render=NULL;
-		this->window=NULL;
-		this->scene=NULL;
+		this->curCamera=nullptr;
+		this->render=nullptr;
+		this->window=nullptr;
+		this->scene=nullptr;
 
-		this->OnClose	=	NULL;
-		this->OnKeyDown	=	NULL;
-		this->OnKeyUp	=	NULL;
-		this->OnMouseDown=	NULL;
-		this->OnMouseMove=	NULL;
-		this->OnMouseUp	=	NULL;
-		this->OnResize	=	NULL;
-		this->OnStart	=	NULL;
-		this->Refresh	=	NULL;
+		this->OnClose	=	nullptr;
+		this->OnKeyDown	=	nullptr;
+		this->OnKeyUp	=	nullptr;
+		this->OnMouseDown=	nullptr;
+		this->OnMouseMove=	nullptr;
+		this->OnMouseUp	=	nullptr;
+		this->OnResize	=	nullptr;
+		this->OnStart	=	nullptr;
+		this->Refresh	=	nullptr;
 
 		memset(this->keys,0,sizeof(this->keys));
 	}
@@ -46,10 +47,10 @@ namespace aengine
 
 				AERenderFactory rfactory;
 
-				this->render=rfactory.GetRenderUnit("GL");
-				if(this->render==NULL)
+				this->render=rfactory.GetRenderUnit("GLES");
+				if(!this->render)
 				{
-					puts("Incorrect RenderUnit");
+					AEPrintLog("Incorrect RenderUnit");
 					return AE_ERR;
 				}
 				if(!this->render->Init(640,480))
@@ -61,17 +62,18 @@ namespace aengine
 			}
 			else
 			{
-				this->window->InitWindow(640,480,16,AE_SDL_WINDOW);
+				this->window->InitWindow(640,480,16,NULL);
 			}
 		}
 		if(flags&AE_INIT_SCENE)
 		{
-			puts("Scene created");
+			AEPrintLog("Scene created");
 			this->scene=new AEScene();
 
 			if(flags&AE_INIT_CAMERA)
 			{
 				this->curCamera=new AEObjectCamera;
+				this->curCamera->name="BasicCamera";
 				this->scene->AddObject(this->curCamera);
 			}
 		}
@@ -141,7 +143,9 @@ namespace aengine
 
 		this->render->Resize(width,height);
 
-		printf("Window resized [%d,%d];\n",width,height);
+		char buf[256];
+		sprintf(buf,"Window resized [%d,%d];\n",width,height);
+		AEPrintLog(buf);
 
 		if(this->OnResize!=NULL)
 			OnResize(param);

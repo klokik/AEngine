@@ -35,11 +35,12 @@ namespace aengine
 
 		AEScene *scene;
 
-		AEMatrix4f4   identity;
+		AEMatrix4f4 identity;
 
-		AEMatrixStack mvsmatrix;
-		AEMatrix4f4	  cammatrix;
-		AEMatrix4f4   prjmatrix;
+		// AEMatrixStack mvsmatrix;
+		AEMatrix4f4 cammatrix;
+		AEMatrixStack prjmatrix;
+		AEMatrix4f4 orthomatrix;
 
 		AEObject *curCam;
 
@@ -95,7 +96,7 @@ namespace aengine
 
 		virtual void Set2DMode(void);
 		virtual void PopMode(void);
-		virtual int CheckError(void) const;
+		void SetFixedProjectionMatrix(void);
 
 		virtual unsigned int GetGLVersion(void);
 
@@ -112,6 +113,8 @@ namespace aengine
 
 		virtual void QueueObject(AEObject *obj);
 		virtual void Render(AEObjectCamera *camera);
+
+		static int CheckError(void);
 
 		virtual ~AEGLRenderUnit(void);
 	};

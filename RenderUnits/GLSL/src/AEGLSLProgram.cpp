@@ -5,130 +5,139 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-
+#include "AEGLHeader.h"
 #include "AEGLSLProgram.h"
+#include "AEDebug.h"
+#include <stdio.h>
 
-AEGLSLProperty::AEGLSLProperty(void)
-{
-	this->id=0;
-	this->type=0;
-}
 
-AEGLSLShader::AEGLSLShader(uint32_t _type)
+namespace aengine
 {
-	this->type=_type;
-	this->id=glCreateShader(type);
-}
+	AEGLSLProperty::AEGLSLProperty(void)
+	{
+		this->id=0;
+		this->type=0;
+	}
 
-void AEGLSLShader::ShaderData(const char **str, uint32_t count, const int *length)
-{
-	glShaderSource(this->id,count,str,length);
-}
+	AEGLSLShader::AEGLSLShader(uint32_t _type)
+	{
+		this->type=_type;
+		this->id=glCreateShader(type);
+	}
 
-void AEGLSLShader::Compile(void)
-{
-	glCompileShader(this->id);
-}
+	void AEGLSLShader::ShaderData(const char **str, uint32_t count, const int *length)
+	{
+		glShaderSource(this->id,count,str,length);
+	}
 
-int AEGLSLShader::GetCompileStatus(void)
-{
-	int result;
-	glGetShaderiv(this->id,GL_COMPILE_STATUS,&result);
-	return result;
-}
+	void AEGLSLShader::Compile(void)
+	{
+		glCompileShader(this->id);
+	}
 
-std::string AEGLSLShader::GetLog(void)
-{
-	int mlength,length;
-	glGetShaderiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
-	char *buf=(char*)malloc(mlength*sizeof(char));
-	glGetShaderInfoLog(this->id,mlength,&length,buf);
-	std::string str;
-	str.append(buf,length);
-	free(buf);
-	return str;
-}
+	int AEGLSLShader::GetCompileStatus(void)
+	{
+		int result;
+		glGetShaderiv(this->id,GL_COMPILE_STATUS,&result);
+		char buf[256];
+		sprintf(buf,"compile status: %d",result);
+		AEPrintLog(buf);
+		return result;
+	}
 
-AEGLSLShader::~AEGLSLShader(void)
-{
-	glDeleteShader(this->id);
-}
+	std::string AEGLSLShader::GetLog(void)
+	{
+		char tmp[128];
+		GLint mlength;
+		glGetShaderiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
+		sprintf(tmp,"Log length: %d",mlength);
+		mlength = 2048;
+		AEPrintLog(tmp);
+		char *buf=(char*)malloc(mlength*sizeof(char));
+		glGetShaderInfoLog(this->id,mlength,nullptr,buf);
+		std::string str;
+		str.append(buf);
+		free(buf);
+		return str;
+	}
 
-AEGLSLProgram::AEGLSLProgram(void)
-{
-	this->id=glCreateProgram();
-}
+	AEGLSLShader::~AEGLSLShader(void)
+	{
+		if(this->id)
+			glDeleteShader(this->id);
+	}
 
-void AEGLSLProgram::Use(void)
-{
-	glUseProgram(this->id);
-}
+	AEGLSLProgram::AEGLSLProgram(void)
+	{
+		this->id=glCreateProgram();
+	}
 
-void AEGLSLProgram::Attach(AEGLSLShader *shd)
-{
-	glAttachShader(this->id,shd->id);
-}
+	void AEGLSLProgram::Use(void)
+	{
+		glUseProgram(this->id);
+	}
 
-void AEGLSLProgram::Detach(AEGLSLShader *shd)
-{
-	glDetachShader(this->id,shd->id);
-}
+	void AEGLSLProgram::Attach(AEGLSLShader *shd)
+	{
+		glAttachShader(this->id,shd->id);
+	}
 
-void AEGLSLProgram::Link(void)
-{
-	glLinkProgram(this->id);
-}
+	void AEGLSLProgram::Detach(AEGLSLShader *shd)
+	{
+		glDetachShader(this->id,shd->id);
+	}
 
-int AEGLSLProgram::GetLinkStatus(void)
-{
-	int result;
-	glGetProgramiv(this->id,GL_LINK_STATUS,&result);
-	return result;
-}
+	void AEGLSLProgram::Link(void)
+	{
+		glLinkProgram(this->id);
+	}
 
-std::string AEGLSLProgram::GetLog(void)
-{
-	int mlength,length;
-	glGetProgramiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
-	char *buf=(char*)malloc(mlength*sizeof(char));
-	glGetProgramInfoLog(this->id,mlength,&length,buf);
-	std::string str;
-	str.append(buf,length);
-	free(buf);
-	return str;
-}
+	int AEGLSLProgram::GetLinkStatus(void)
+	{
+		int result;
+		glGetProgramiv(this->id,GL_LINK_STATUS,&result);
+		return result;
+	}
 
-int AEGLSLProgram::GetUniform(const char *name)
-{
-	return glGetUniformLocation(this->id,name);
-}
+	std::string AEGLSLProgram::GetLog(void)
+	{
+		int mlength,length;
+		glGetProgramiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
+		char *buf=(char*)malloc(mlength*sizeof(char));
+		glGetProgramInfoLog(this->id,mlength,&length,buf);
+		std::string str;
+		str.append(buf,length);
+		free(buf);
+		return str;
+	}
 
-int AEGLSLProgram::GetAttribute(const char *name)
-{
-	return glGetAttribLocation(this->id,name);
-}
+	int AEGLSLProgram::GetUniform(const char *name)
+	{
+		return glGetUniformLocation(this->id,name);
+	}
 
-void AEGLSLProgram::GetUniform(AEGLSLProperty & prop)
-{
-	prop.id=GetUniform(prop.name.c_str());
-}
+	int AEGLSLProgram::GetAttribute(const char *name)
+	{
+		return glGetAttribLocation(this->id,name);
+	}
 
-void AEGLSLProgram::GetAttribute(AEGLSLProperty & prop)
-{
-	prop.id=GetAttribute(prop.name.c_str());
-}
+	void AEGLSLProgram::GetUniform(AEGLSLProperty & prop)
+	{
+		prop.id=GetUniform(prop.name.c_str());
+	}
 
-void AEGLSLProgram::GetShaderProperties(void)
-{
-	//nothing to do here
-}
+	void AEGLSLProgram::GetAttribute(AEGLSLProperty & prop)
+	{
+		prop.id=GetAttribute(prop.name.c_str());
+	}
 
-AEGLSLProgram::~AEGLSLProgram(void)
-{
-	glDeleteProgram(this->id);
+	void AEGLSLProgram::GetShaderProperties(void)
+	{
+		//nothing to do here
+	}
+
+	AEGLSLProgram::~AEGLSLProgram(void)
+	{
+		glDeleteProgram(this->id);
+	}
 }

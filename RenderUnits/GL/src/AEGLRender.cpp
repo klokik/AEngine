@@ -5,18 +5,13 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
+#include "AEGLHeader.h"
 #include "AEDefines.h"
 #include "AEGLRender.h"
+#include "AEDebug.h"
 
 
 namespace aengine
@@ -59,12 +54,14 @@ namespace aengine
 
 	int AEGLRenderUnit::InitGL(void)
 	{
-		glShadeModel(GL_SMOOTH);			// Enable smooth shading
+		// glShadeModel(GL_SMOOTH);			// Enable smooth shading
 		//glClearColor(0.0f,0.2f,0.2f,0.0f);	// Color to use for clearing screen
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
-		glClearDepth(1.0f);					// Specify the depth buffer cleaning value
+		glClearDepthf(1.0f);					// Specify the depth buffer cleaning value
 		glDepthFunc(GL_LEQUAL);				// The type of depth test to do
+#if !defined(AE_NEW_GL_CONTEXT)
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST); //type of perspective calculations;
+#endif
 
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -80,16 +77,20 @@ namespace aengine
 		this->width=_width;
 		this->height=_height;
 
-		GLfloat ratio;									// window aspect ratio width/height
-		if(height==0) height=1;	 						//protect from division by zero
-		ratio=(GLfloat)width/(GLfloat)height;
+		// protect from division by zero
+		if(height==0) height=1;
+		if(width==0) width=1;
 
 		glViewport(0,0,(GLfloat)width,(GLfloat)height); // Set up viewport
-		glMatrixMode(GL_PROJECTION);					// Change to the projection
-		glLoadIdentity();								// matrix and set viewing volume
-		gluPerspective(45.0f,ratio,0.1f,200.0f);		// Set perspective
-		glMatrixMode(GL_MODELVIEW);						//Make sure we are changing modelview, not projection
-		glLoadIdentity();								// Reset the view
+
+		// recalculate orthographic matrix
+		float o_mtx[16]={
+			2.0f/width, 0, 0,0,
+			0, 2.0f/height, 0,0,
+			0,0,-1,0,
+			-1,-1,0,1
+		};
+		orthomatrix=o_mtx;
 	}
 
 	void AEGLRenderUnit::QueueObject(AEObject * obj)
@@ -97,37 +98,31 @@ namespace aengine
 		switch(obj->type)
 		{
 		case AE_OBJ_EMPTY:
-			//this->RenderEmpty(obj);
 			this->type_cache.empties.push_back(obj);
 			break;
 		case AE_OBJ_MESH:
-			//this->RenderMesh(dynamic_cast<AEObjectMesh*>(obj));
 			this->type_cache.meshes.push_back(obj);
-			// check if mesh is cached
-			if((dynamic_cast<AEObjectMesh*>(obj))->mesh&&!(dynamic_cast<AEObjectMesh*>(obj))->mesh->cached)
+			// check if mesh exists and is cached
+			if((static_cast<AEObjectMesh*>(obj))->mesh&&!(static_cast<AEObjectMesh*>(obj))->mesh->cached)
 				CacheObject(obj);
 			break;
 		case AE_OBJ_SPRITE:
 			if(obj->projection==AE_ORTHOGRAPHIC)
-				this->type_cache.sprites_ortho.push_back(dynamic_cast<AEObjectSprite*>(obj));
+				this->type_cache.sprites_ortho.push_back(static_cast<AEObjectSprite*>(obj));
 			else
-				this->type_cache.sprites_persp.push_back(dynamic_cast<AEObjectSprite*>(obj));
+				this->type_cache.sprites_persp.push_back(static_cast<AEObjectSprite*>(obj));
 			break;
 		case AE_OBJ_TEXT:
-			//this->RenderText(dynamic_cast<AEObjectText*>(obj));
-			this->type_cache.texts.push_back(dynamic_cast<AEObjectText*>(obj));
+			this->type_cache.texts.push_back(static_cast<AEObjectText*>(obj));
 			break;
 		case AE_OBJ_JOINT:
-			//this->RenderJoint(dynamic_cast<AEObjectJoint*>(obj));
-			this->type_cache.joints.push_back(dynamic_cast<AEObjectJoint*>(obj));
+			this->type_cache.joints.push_back(static_cast<AEObjectJoint*>(obj));
 			break;
 		// case AE_OBJ_CAMERA:
 		// 	break;
 		default:
 			this->type_cache.empties.push_back(obj);
 			//render empty for debug purposes
-			// or better render nothing
-			//this->RenderEmpty(obj);
 			break;
 		}
 
@@ -143,7 +138,7 @@ namespace aengine
 	{
 		type_cache.Clear();
 
-		mvsmatrix.SetIdentity();
+		this->SetFixedProjectionMatrix();
 
 		if(camera!=NULL)
 		{
@@ -151,6 +146,10 @@ namespace aengine
 
 			camera->CalculateCameraMatrix(false);
 			cammatrix=camera->GetCameraMatrix();
+
+			camera->ratio=width/(float)height;
+			camera->InvalidateProjection();
+			prjmatrix=camera->GetProjectionMatrix();
 		}
 
 
@@ -159,7 +158,7 @@ namespace aengine
 
 		if(this->scene==NULL)
 		{
-			printf("Please cache scene before usage\n");
+			AEPrintLog("Specify scene to render, or use CacheScene");
 			throw 0;
 		}
 
@@ -192,35 +191,32 @@ namespace aengine
 
 	void AEGLRenderUnit::Set2DMode(void)
 	{
-		//TODO Use own projection matrices
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glOrtho(0,width,0,height,-1.0,1.0);
-		float mat[16];
-		glGetFloatv(GL_PROJECTION_MATRIX,mat);
-		prjmatrix=mat;
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
+		prjmatrix.PushMatrix();
 
-		glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_LIGHTING_BIT);
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
+		prjmatrix=orthomatrix;
+
+//		glPushAttrib(GL_DEPTH_BUFFER_BIT);
+//		glDisable(GL_DEPTH_TEST);
 	}
 
 	void AEGLRenderUnit::PopMode(void)
 	{
-		glPopAttrib();
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		float mat[16];
-		glGetFloatv(GL_PROJECTION_MATRIX,mat);
-		prjmatrix=mat;
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
+		prjmatrix.PopMatrix();
+
+//		glPopAttrib();
 	}
 
-	int AEGLRenderUnit::CheckError(void) const
+	void AEGLRenderUnit::SetFixedProjectionMatrix()
+	{
+#if !defined(AE_NEW_GL_CONTEXT)
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMultMatrixf(prjmatrix);
+		glMatrixMode(GL_MODELVIEW);
+#endif
+	}
+
+	int AEGLRenderUnit::CheckError(void)
 	{
 		GLenum err=glGetError();
 
@@ -229,22 +225,16 @@ namespace aengine
 		case GL_NO_ERROR:
 			return AE_OK;
 		case GL_INVALID_ENUM:
-			puts("err: invalid enumeration;");
+			AEPrintLog("err: invalid enumeration;");
 			break;
 		case GL_INVALID_VALUE:
-			puts("err: invalid value;");
+			AEPrintLog("err: invalid value;");
 			break;
 		case GL_INVALID_OPERATION:
-			puts("err: invalid operation;");
-			break;
-		case GL_STACK_OVERFLOW:
-			puts("err: stack underflow;");
+			AEPrintLog("err: invalid operation;");
 			break;
 		case GL_OUT_OF_MEMORY:
-			puts("err: out of memory;");
-			break;
-		case GL_TABLE_TOO_LARGE:
-			puts("err: table too large;");
+			AEPrintLog("err: out of memory;");
 			break;
 		}
 		return AE_ERR;
@@ -262,6 +252,7 @@ namespace aengine
 
 	bool AEGLRenderUnit::ApplyMaterial(AEMaterial *mat)
 	{
+#if !defined(AE_NEW_GL_CONTEXT)
 		if(!mat)
 		{
 			glColor3f(1.0f,1.0f,1.0f);
@@ -279,6 +270,7 @@ namespace aengine
 				return true;
 			}
 		}
+#endif
 		return false;
 	}
 

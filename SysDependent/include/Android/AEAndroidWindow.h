@@ -27,6 +27,9 @@ namespace aengine
 
 		struct android_app *a_app;
 
+		bool first_init_call;
+		bool break_after_init;
+
 		virtual void *WndProc(void *param) override;
 
 		static int32_t HandleInput(struct android_app *app,AInputEvent *event);

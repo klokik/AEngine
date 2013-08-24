@@ -5,16 +5,12 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-
+#include "AEGLHeader.h"
 #include "AEGLRender.h"
 #include "AEVectorMath.h"
 
 
+#if !defined(AE_NEW_GL_CONTEXT)
 namespace aengine
 {
 	void AEGLRenderUnit::RenderText(AEObjectText *obj)
@@ -31,6 +27,7 @@ namespace aengine
 		if(obj->projection==AE_ORTHOGRAPHIC)
 		{
 			this->Set2DMode();
+			this->SetFixedProjectionMatrix();
 			glLoadMatrixf(obj->GetWorldMatrix().ToArray());
 		}
 		else
@@ -80,7 +77,10 @@ namespace aengine
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		if(obj->projection==AE_ORTHOGRAPHIC)
+		{
 			this->PopMode();
+			this->SetFixedProjectionMatrix();
+		}
 	}
 
 	void AEGLRenderUnit::RenderTexts(void)
@@ -91,3 +91,10 @@ namespace aengine
 		}
 	}
 }
+#else
+namespace aengine
+{
+	void AEGLRenderUnit::RenderText(AEObjectText *obj) {}
+	void AEGLRenderUnit::RenderTexts(void) {}
+}
+#endif /* !AE_NEW_GL_CONTEXT */

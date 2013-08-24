@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <math.h>
+#include <sstream>
 
 #include "AEObject.h"
 #include "AEVectorMath.h"
@@ -42,6 +43,11 @@ AEObject::AEObject(void):
 
 	this->_bounding_sphere.radius=1.0f;
 	this->_bounding_sphere.color={1.0f,1.0f,1.0f,1.0f};
+
+	static int counter=0;
+	std::stringstream sstr;
+	sstr<<"unnamed_"<<counter++;
+	this->name=sstr.str();
 }
 
 void AEObject::AddChild(AEObject *child)

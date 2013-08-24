@@ -19,7 +19,7 @@
 #endif
 
 #if defined(BUILD_GLES_RENDER)
- 	#include "AEGLSLRender.h"
+ 	#include "AEGLESRender.h"
 #endif
 
 #include "AERenderFactory.h"

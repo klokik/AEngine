@@ -5,16 +5,13 @@
  *      Author: klokik
  */
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
 #include <math.h>
 
+#include "AEGLHeader.h"
 #include "AEGLRender.h"
 
 
+#if !defined(AE_NEW_GL_CONTEXT)
 namespace aengine
 {
 	const float rad=57.29577951f;
@@ -80,7 +77,8 @@ namespace aengine
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 
-		this->Set2DMode();
+		// this->Set2DMode();
+		this->SetFixedProjectionMatrix();
 
 		for(AEObjectSprite *obj:type_cache.sprites_ortho)
 		{
@@ -96,10 +94,18 @@ namespace aengine
 				glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 		}
 
-		this->PopMode();
+		// this->PopMode();
+		this->SetFixedProjectionMatrix();
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 	}
 }
+#else
+namespace aengine
+{
+	void AEGLRenderUnit::RenderSpritesPersp(void) {};
+	void AEGLRenderUnit::RenderSpritesOrtho(void) {};
+}
+#endif /* !AE_NEW_GL_CONTEXT */

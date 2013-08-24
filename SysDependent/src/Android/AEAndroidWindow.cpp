@@ -24,15 +24,16 @@ int main(int argc,char **argv);
 
 extern "C"
 {
+	static struct android_app *start_state=nullptr;
 	// Android entry point
 	void android_main(struct android_app *state)
 	{
 		// check if glue was not stripped
-		//app_dummy();
+		app_dummy();
 
 		LOGI("App started");
 
-		return;
+		start_state=state;
 
 		main(1,(char**)&state);
 	}
@@ -47,16 +48,24 @@ namespace aengine
 		context=EGL_NO_CONTEXT;
 		surface=EGL_NO_SURFACE;
 
-		a_app=nullptr;
+		a_app=start_state;//nullptr;
+
+		this->first_init_call=true;
+		this->break_after_init=false;
 
 		LOGI("Window created");
 	}
 
 	void *AEAndroidWindow::WndProc(void* wparam)
 	{
-		struct android_app *state=static_cast<AEAndroidWindow*>(wparam)->a_app;
+		LOGW("Wnd proc started");
 
-		state->userData=wparam;
+		struct android_app *state=this->a_app;
+
+		state->onAppCmd=AEAndroidWindow::HandleCmd;
+		state->onInputEvent=AEAndroidWindow::HandleInput;
+		state->userData=this;
+		LOGI("Window: %d",this);
 
 		if(state->savedState)
 		{
@@ -66,6 +75,8 @@ namespace aengine
 		}
 		else
 			LOGI("Nothing to restore");
+
+		this->CallEvent(AE_EVENT_START,nullptr);
 
 		// loop waiting for stuff to do.
 
@@ -110,7 +121,17 @@ namespace aengine
 					a_event=0;
 				}
 			}
-			this->CallEvent(AE_REFRESH,param);
+
+			if(this->break_after_init)
+			{
+				this->break_after_init=false;
+				break;
+			}
+
+			if(active)
+			{
+				this->CallEvent(AE_REFRESH,param);
+			}
 		}
 
 		return nullptr;
@@ -118,9 +139,34 @@ namespace aengine
 
 	int32_t AEAndroidWindow::HandleInput(struct android_app *app,AInputEvent *event)
 	{
+		AEAndroidWindow *wnd=static_cast<AEAndroidWindow*>(app->userData);
+
 		if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_MOTION)
 		{
-			LOGI("Motion input");
+			float x=AMotionEvent_getX(event,0);
+			float y=AMotionEvent_getY(event,0);
+
+			static float last_x=x;
+			static float last_y=y;
+
+			int param[]={
+				(int)x,
+				(int)(wnd->height-y),
+				(int)(x-last_x),
+				-(int)(y-last_y),
+				2
+			};
+			last_x=x;
+			last_y=y;
+
+			if((AMOTION_EVENT_ACTION_DOWN|AMOTION_EVENT_ACTION_POINTER_DOWN)&AMotionEvent_getAction(event))
+			{
+				param[2]=2;
+				param[3]=0;
+				wnd->CallEvent(AE_EVENT_MOUSEDOWN,param);
+			}
+			if(AMotionEvent_getAction(event)&AMOTION_EVENT_ACTION_MOVE)
+				wnd->CallEvent(AE_EVENT_MOUSEMOVE,param);
 		}
 		else if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_KEY)
 		{
@@ -133,6 +179,7 @@ namespace aengine
 	{
 		AEAndroidWindow *wnd=static_cast<AEAndroidWindow*>(app->userData);
 
+		int param[5]={0};
 		switch(cmd)
 		{
 		case APP_CMD_SAVE_STATE:
@@ -141,75 +188,157 @@ namespace aengine
 			// *((struct saved_state*)wnd->app->savedState) = wnd->state;
 			// wnd->app->savedStateSize = sizeof(struct saved_state);
 			// wnd->engine->Suspend()
-			LOGI("Save state");
+			LOGI("cmd: Save state");
 			break;
 		case APP_CMD_INIT_WINDOW:
 			// The window is being shown, get it ready.
-			if(wnd->a_app->window!=nullptr)
+			if(wnd->a_app->window&&wnd->context==EGL_NO_CONTEXT)
 			{
-				wnd->InitDisplay();
-				LOGI("Init window");
+				LOGI("cmd: Init window");
+				if(!wnd->InitDisplay())
+				{
+					LOGW("Display init FAILED");
+				}
+				if(wnd->first_init_call)
+				{
+					wnd->first_init_call=false;
+					wnd->break_after_init=true;
+				}
 			}
 			break;
 		case APP_CMD_TERM_WINDOW:
 			// The window is being hidden or closed, clean it up.
 			wnd->TerminateDisplay();
-			LOGI("Terminate window");
+			LOGI("cmd: Terminate window");
 			break;
 		case APP_CMD_GAINED_FOCUS:
 			wnd->active=true;
-			LOGI("Window activated");
+			LOGI("cmd: Window %d activated",wnd);
 			break;
 		case APP_CMD_LOST_FOCUS:
 			wnd->active=false;
-			LOGI("Window lost focus");
+			LOGI("cmd: Window lost focus");
 			break;
+		case APP_CMD_WINDOW_RESIZED:
+			break;
+		case APP_CMD_CONFIG_CHANGED:
+			break;
+		}
+
+		if(wnd->active)
+		{
+			int32_t new_width=ANativeWindow_getWidth(wnd->a_app->window);
+			int32_t new_height=ANativeWindow_getHeight(wnd->a_app->window);
+			if(wnd->width!=new_width||wnd->height!=new_height)
+			{
+				LOGI("cmd: Window resized");
+				param[0]=wnd->width=new_width;
+				param[1]=wnd->height=new_height;
+				wnd->CallEvent(AE_EVENT_RESIZE,param);
+			}
 		}
 	}
 
 	int AEAndroidWindow::InitDisplay(void)
 	{
 		if(!a_app)
+		{
+			LOGW("Something's wrong with world::a_app");
 			return AE_ERR;
+		}
 
-		// initialize OpenGL ES and EGL
-		/*
-		 * Here specify the attributes of the desired configuration.
-		 * Below, we select an EGLConfig with at least 8 bits per color
-		 * component compatible with on-screen windows
-		 */
-		const EGLint attribs[]={
-				EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-				EGL_BLUE_SIZE, 8,
-				EGL_GREEN_SIZE, 8,
-				EGL_RED_SIZE, 8,
+		// initialize EGL
+
+		EGLint w,h,format;
+		EGLSurface surface;
+		EGLContext context;
+
+		EGLDisplay display=eglGetDisplay(EGL_DEFAULT_DISPLAY);
+
+		EGLint major_version;
+		EGLint minor_version;
+
+		eglInitialize(display,&major_version,&minor_version);
+		LOGI("EGL %i.%i",major_version,minor_version);
+
+		//query num of configs
+		int num_conf=0;
+		eglGetConfigs(display,nullptr,0,&num_conf);  //if configuration array is null it still returns the number of configurations
+
+		LOGI("total num configs: %i",num_conf);
+
+		//now query the configs
+		EGLConfig* conf=new EGLConfig[num_conf];
+		eglGetConfigs(display,conf,num_conf,&num_conf);
+
+		int r=0;
+		int g=0;
+		int b=0;
+		int a=0;
+		int depth=0;
+		int stencil=0;
+		int render_type=0;
+		int surface_type=0;
+		int format_type=0;
+
+		//this is the one true config that we will use
+		EGLConfig config_to_use;
+
+		for(int q=0;q<num_conf;q++)
+		{
+			eglGetConfigAttrib(display,conf[q],EGL_RED_SIZE,&r);
+			eglGetConfigAttrib(display,conf[q],EGL_GREEN_SIZE,&g);
+			eglGetConfigAttrib(display,conf[q],EGL_BLUE_SIZE,&b);
+			eglGetConfigAttrib(display,conf[q],EGL_ALPHA_SIZE,&a);
+			eglGetConfigAttrib(display,conf[q],EGL_DEPTH_SIZE,&depth);
+			eglGetConfigAttrib(display,conf[q],EGL_STENCIL_SIZE,&stencil);
+			eglGetConfigAttrib(display,conf[q],EGL_RENDERABLE_TYPE,&render_type);
+			eglGetConfigAttrib(display,conf[q],EGL_SURFACE_TYPE,&surface_type);
+			eglGetConfigAttrib(display,conf[q],EGL_NATIVE_VISUAL_ID,&format_type);
+
+			LOGI("%d: (R%dG%dB%dA%d)depth:(%d) stencil:(%d) surfaceType:(%d) renderType:(%d) formatType:(%d)",
+				q, r,g,b,a,depth,stencil,surface_type, render_type,format_type);
+
+			if((render_type&EGL_OPENGL_ES2_BIT)&&
+				(surface_type&EGL_WINDOW_BIT)&&
+				(format_type&WINDOW_FORMAT_RGB_565)&&
+				depth>0)
+			{
+				config_to_use=conf[q];
+
+				LOGI("Using config #%d",q);
+				break;
+			}
+		}
+
+		//bridge the pixel format back into android
+		eglGetConfigAttrib(display,config_to_use,EGL_NATIVE_VISUAL_ID,&format);
+		ANativeWindow_setBuffersGeometry(a_app->window,0,0,format);
+
+		surface=eglCreateWindowSurface(display,config_to_use,a_app->window,nullptr);
+
+		if(surface==EGL_NO_SURFACE)
+		{
+			LOGW("Error making surface, EGL_NO_SURFACE");
+			return AE_ERR;
+		}
+
+		//now create the OpenGL ES2 context
+		const EGLint contextAttribs[]=
+		{
+				EGL_CONTEXT_CLIENT_VERSION, 2,
 				EGL_NONE
 		};
-		EGLint w, h, format;
-		EGLint numConfigs;
-		EGLConfig config;
 
-		display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+		context=eglCreateContext(display,config_to_use,EGL_NO_CONTEXT,contextAttribs);
 
-		eglInitialize(display,0,0);
+		if(context==EGL_NO_CONTEXT)
+		{
+			LOGW("Error making context, EGL_NO_CONTEXT");
+			return AE_ERR;
+		}
 
-		/* Here, the application chooses the configuration it desires. In this
-		 * sample, we have a very simplified selection process, where we pick
-		 * the first EGLConfig that matches our criteria */
-		eglChooseConfig(display,attribs,&config,1,&numConfigs);
-
-		/* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-		 * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-		 * As soon as we picked a EGLConfig, we can safely reconfigure the
-		 * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-		eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-
-		ANativeWindow_setBuffersGeometry(a_app->window, 0, 0, format);
-
-		surface = eglCreateWindowSurface(display, config, a_app->window, NULL);
-		context = eglCreateContext(display, config, NULL, NULL);
-
-		if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE)
+		if(eglMakeCurrent(display,surface,surface,context)==EGL_FALSE)
 		{
 			LOGW("Unable to eglMakeCurrent");
 			return AE_ERR;
@@ -217,6 +346,14 @@ namespace aengine
 
 		eglQuerySurface(display,surface,EGL_WIDTH,&w);
 		eglQuerySurface(display,surface,EGL_HEIGHT,&h);
+
+		this->display=display;
+		this->context=context;
+		this->surface=surface;
+		this->width=w;
+		this->height=h;
+
+		LOGI("Renderer: %s",glGetString(GL_VERSION));
 
 		if(width!=w||height!=h)
 		{
@@ -228,6 +365,8 @@ namespace aengine
 			param[1]=this->height;
 			this->CallEvent(AE_EVENT_RESIZE,param);
 		}
+		
+		LOGI("Display init succeed: %dx%d",w,h);
 
 		return AE_OK;
 	}
@@ -250,13 +389,20 @@ namespace aengine
 		display=EGL_NO_DISPLAY;
 		context=EGL_NO_CONTEXT;
 		surface=EGL_NO_SURFACE;
+
+		this->active=false;
 	}
 
 	int AEAndroidWindow::InitWindow(uint16_t _width,uint16_t _height,uint8_t _bpp,AE_WINDOW_TYPE _type)
 	{
+		LOGI("Init android window and wait for it to be shown");
+
 		AEWindow::InitWindow(_width,_height,_bpp,_type);
 
-		return InitDisplay();
+		this->break_after_init=false;
+		this->WndProc(nullptr);
+
+		return AE_OK;
 	}
 
 	void AEAndroidWindow::SetCursorPos(uint16_t x,uint16_t y)
