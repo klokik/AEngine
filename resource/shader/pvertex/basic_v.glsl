@@ -22,11 +22,11 @@ attribute vec3 a_vertex;
 attribute vec3 a_normal;
 attribute vec2 a_texcoord0;
 
-varying vec3 f_normal;
+// varying vec3 f_normal;
 varying vec2 f_texcoord0;
-varying vec3 f_pos;
+//varying vec3 f_pos;
 //varying vec3 f_eyevec;
-//varying vec3 f_light;
+varying vec3 f_light;
 
 //forward declaration
 void passData(void);
@@ -38,33 +38,27 @@ void main(void)
 {
 	pos=u_object_matrix*vec4(a_vertex,1.0);
 	gl_Position=u_projection_matrix*u_camera_matrix*pos;
-	
-	//f_eyevec=pos.xyz;
 
-//	if(u_shaded!=0)
-//		setLighting();
-//	else f_light=vec3(1,1,1);
+	setLighting();
+
 	passData();
 }
 
 void passData(void)
 {
 	f_texcoord0=a_texcoord0;
-	f_normal=mat3x3(u_camera_matrix*u_object_matrix)*a_normal;
-
-	f_pos = (u_camera_matrix*pos).xyz;
-	//f_eyevec=gl_Position.xyz;
+	// f_normal=mat3x3(u_camera_matrix*u_object_matrix)*a_normal;
 }
 
 void setLighting(void)
 {
 	vec3 r_color=vec3(0,0,0);
 
-	//mat3x3 normal_matrix=;
-	//mat3 normal_matrix=transpose(mat3(u_object_matrix));//transpose(inverse(mat3x3()));
-	vec3 N=normalize(gl_NormalMatrix*a_normal);
-	//f_light=normalize(N)/2+0.5;
-	//return;
+	//vec3 N=normalize(mat3x3(u_camera_matrix*u_object_matrix)*a_normal);
+	// f_light=vec3(0.5);//normalize(N)/2+0.5;
+	// return;
+
+	vec3 N=normalize(mat3x3(u_camera_matrix*u_object_matrix)*a_normal);
 
 	for(int q=0;q<u_light_num;q++)
 	{
@@ -89,7 +83,7 @@ void setLighting(void)
 			vec3 Lr=max(dot(-L,N),0.0)*u_lights.color[q].rgb*u_lights.color[q].a;
 
 
-			//FIXIT it's slow
+			// Spot light
 			if(u_lights.type[q]==0x04)
 			{
 				float cur_angle=dot(normalize(u_lights.rotation[q]),L);
@@ -100,12 +94,12 @@ void setLighting(void)
 				else
 					continue;
 			}
-			//---------------
 
 			Lr=max(Lr*atten,vec3(0,0,0));
 			r_color.rgb+=Lr;
 		}
 	}
-	//f_light=r_color;
+
+	f_light=r_color;
 }
 
