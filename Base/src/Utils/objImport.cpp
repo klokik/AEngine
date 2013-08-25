@@ -207,6 +207,10 @@ void LoadObjFile(AEMesh &mesh, const char *path)
 		printf("Vertex: %d;\nFace: %d\nNormals: %d\nTexCoords: %d\n",mesh.vtxcount,mesh.fcecount,mesh.nrmcount,mesh.tcrcount);
 		fclose(f);
 	}
+	else
+	{
+		printf("File \"%s\" not found\n",path);
+	}
 }
 
 #endif

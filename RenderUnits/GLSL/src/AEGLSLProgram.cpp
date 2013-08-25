@@ -8,6 +8,7 @@
 #include "AEGLHeader.h"
 #include "AEGLSLProgram.h"
 #include "AEDebug.h"
+#include "AEDefines.h"
 #include <stdio.h>
 
 
@@ -25,14 +26,24 @@ namespace aengine
 		this->id=glCreateShader(type);
 	}
 
-	void AEGLSLShader::ShaderData(const char **str, uint32_t count, const int *length)
+	void AEGLSLShader::ShaderData(std::string data)
 	{
-		glShaderSource(this->id,count,str,length);
+		const char *c_data=data.data();
+		glShaderSource(this->id,1,&c_data,nullptr);
 	}
 
-	void AEGLSLShader::Compile(void)
+	int AEGLSLShader::Compile(bool quiet)
 	{
 		glCompileShader(this->id);
+
+		if(GetCompileStatus()!=GL_TRUE)
+		{
+			if(!quiet)
+				AEPrintLog(GetLog());
+			return AE_ERR;
+		}
+
+		return AE_OK;
 	}
 
 	int AEGLSLShader::GetCompileStatus(void)
@@ -47,12 +58,8 @@ namespace aengine
 
 	std::string AEGLSLShader::GetLog(void)
 	{
-		char tmp[128];
 		GLint mlength;
 		glGetShaderiv(this->id,GL_INFO_LOG_LENGTH,&mlength);
-		sprintf(tmp,"Log length: %d",mlength);
-		mlength = 2048;
-		AEPrintLog(tmp);
 		char *buf=(char*)malloc(mlength*sizeof(char));
 		glGetShaderInfoLog(this->id,mlength,nullptr,buf);
 		std::string str;
@@ -77,19 +84,28 @@ namespace aengine
 		glUseProgram(this->id);
 	}
 
-	void AEGLSLProgram::Attach(AEGLSLShader *shd)
+	void AEGLSLProgram::Attach(AEGLSLShader &shd)
 	{
-		glAttachShader(this->id,shd->id);
+		glAttachShader(this->id,shd.id);
 	}
 
-	void AEGLSLProgram::Detach(AEGLSLShader *shd)
+	void AEGLSLProgram::Detach(AEGLSLShader &shd)
 	{
-		glDetachShader(this->id,shd->id);
+		glDetachShader(this->id,shd.id);
 	}
 
-	void AEGLSLProgram::Link(void)
+	int AEGLSLProgram::Link(bool quiet)
 	{
 		glLinkProgram(this->id);
+
+		if(GetLinkStatus()!=GL_TRUE)
+		{
+			if(!quiet)
+				AEPrintLog(GetLog());
+			return AE_ERR;
+		}
+
+		return AE_OK;
 	}
 
 	int AEGLSLProgram::GetLinkStatus(void)

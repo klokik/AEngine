@@ -29,7 +29,7 @@ namespace aengine
 		int q=0;
 		for(uint8_t *pt=data;pt!=data+img.size;pt++,q++)
 		{
-			*pt=q%256;
+			*pt=128;//q%256;
 		}
 
 		return AE_OK;

@@ -19,19 +19,32 @@ namespace aengine
 		if(obj->mesh->IsInvalid())
 			AEGLRenderUnit::UpdateMeshBuffers(obj->mesh);
 
-		p_3vmn->Use();
-
-		p_3vmn->BindData(
-				obj->GetWorldMatrix(),
-				obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
-				prjmatrix,
-				obj->mesh,
-				obj->material);
+		if(obj->material&&obj->material->shading)
+		{
+			p_3vmnl->Use();
+			p_3vmnl->BindData(
+					obj->GetWorldMatrix(),
+					obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
+					prjmatrix,
+					obj->mesh,
+					obj->material,
+					lighting_cache);
+		}
+		else
+		{
+			p_3vmn->Use();
+			p_3vmn->BindData(
+					obj->GetWorldMatrix(),
+					obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
+					prjmatrix,
+					obj->mesh,
+					obj->material);
+		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,obj->mesh->idfce);
 
 		glDrawElements(GL_TRIANGLES,obj->mesh->fcecount*3,GL_UNSIGNED_INT,0);
 
-		// p_3vmn->UnbindData();
+		// p_3vmnl->UnbindData();
 
 		glUseProgram(0);
 	}

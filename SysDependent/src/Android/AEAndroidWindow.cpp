@@ -17,6 +17,8 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "AEngine", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "AEngine", __VA_ARGS__))
 
+#include "AEResourceManager.h"
+
 #include "Android/AEAndroidWindow.h"
 
 //future definition for app entry point
@@ -34,6 +36,8 @@ extern "C"
 		LOGI("App started");
 
 		start_state=state;
+
+		aengine::AEResourceManager::SetWorkDirectory("/sdcard/aengine/");
 
 		main(1,(char**)&state);
 	}

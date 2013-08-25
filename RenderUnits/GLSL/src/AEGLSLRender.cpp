@@ -14,6 +14,7 @@
 #include "AEGLSLFilePath.h"
 #include "AEVectorMath.h"
 #include "AEDebug.h"
+#include "AEResourceManager.h"
 
 // Temporary
 #include "../resource/shader/builtin.h"
@@ -55,11 +56,25 @@ namespace aengine
 		AEPrintLog("Initializing shaders:");
 		int result=AE_OK;
 
-		result&=this->Init3vcProgram();
-		result&=this->Init3vmnProgram();
+		p_3vc=new AEGLSLProgram3vc;
+		p_3vmn=new AEGLSLProgram3vmn;
+		p_3vmnl=new AEGLSLProgram3vmnl;
+
+		result&=LoadCompileLink(*p_3vc,
+			AEResourceManager::LoadString(AEGLSL_PATH_3VC_V),
+			AEResourceManager::LoadString(AEGLSL_PATH_3VC_F));
+
+		result&=LoadCompileLink(*p_3vmn,
+			AEResourceManager::LoadString(AEGLSL_PATH_3VMN_V),
+			AEResourceManager::LoadString(AEGLSL_PATH_3VMN_F));
+
+		result&=LoadCompileLink(*p_3vmnl,
+			AEResourceManager::LoadString(AEGLSL_PATH_3VMNL_V),
+			AEResourceManager::LoadString(AEGLSL_PATH_3VMNL_F));
 
 		p_3vm=static_cast<AEGLSLProgram3vm*>(p_3vmn);
-		// result&=this->InitPostPrograms();
+
+		result&=this->InitPostPrograms();
 
 		return result;
 	}
@@ -263,160 +278,35 @@ namespace aengine
 		return atoi(ver);
 	}
 
-	int AEGLSLRenderUnit::Init3vcProgram(void)
+	int AEGLSLRenderUnit::LoadCompileLink(AEGLSLProgram &prog,std::string shader_v,std::string shader_f)
 	{
-		this->p_3vc=new AEGLSLProgram3vc;//this->pmanager.NewProgram(); //FIXME Look here for proper creation of basic program
-		AEGLSLShader *sv,*sf;
-		sv=this->pmanager.NewShader(GL_VERTEX_SHADER);
-		sf=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
+		AEGLSLShader sv(GL_VERTEX_SHADER);
+		AEGLSLShader sf(GL_FRAGMENT_SHADER);
 
-		char buf[1024];
-		sprintf(buf,"Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
-		AEPrintLog(buf);
+		sv.ShaderData(shader_v);
+		sf.ShaderData(shader_f);
 
-		if(!sv||!sf)
-		{
-			AEPrintLog("Failed to create shaders");
+		if(!sv.Compile()||!sf.Compile())
 			return AE_ERR;
-		}
 
-		const char *data=_3vc_v;//AEReadTextFileCml(AEGLSL_PATH_3VC_V);
-		if(*data==AE_ERR) return AE_ERR;
-		sv->ShaderData(&data,1,NULL);
-		data=_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VC_F);
-		if(*data==AE_ERR) return AE_ERR;
-		sf->ShaderData(&data,1,NULL);
+		prog.Attach(sv);
+		prog.Attach(sf);
 
-		//Vertex shader
-		sv->Compile();
-		if(sv->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: v shader compilation failed:");
-			AEPrintLog(sv->GetLog());
+		int lresult=prog.Link();
+
+		prog.Detach(sv);
+		prog.Detach(sf);
+
+		if(!lresult)
 			return AE_ERR;
-		}
-		//Fragment shader
-		sf->Compile();
-		if(sf->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: f shader compilation failed:");
-			AEPrintLog(sf->GetLog());
-			return AE_ERR;
-		}
 
-		this->p_3vc->Attach(sv);
-		this->p_3vc->Attach(sf);
+		prog.GetShaderProperties();
 
-		this->p_3vc->Link();
-		if(this->p_3vc->GetLinkStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: program linkage failed:");
-			AEPrintLog(this->p_3vc->GetLog());
-			return AE_ERR;
-		}
-
-		this->p_3vc->GetShaderProperties();
-
-		// char buf[1024];
-		sprintf(buf,"Program: %d;\nShaders: %d,%d\n",p_3vc->id,sv->id,sf->id);
-		AEPrintLog(buf);
-		return AE_OK;
-	}
-
-	int AEGLSLRenderUnit::Init3vmnProgram(void)
-	{
-		this->p_3vmn=new AEGLSLProgram3vmn;//this->pmanager.NewProgram(); //FIXME Look here for proper creation of basic program
-		AEGLSLShader *sv_mesh,*sf_mesh;
-		sv_mesh=this->pmanager.NewShader(GL_VERTEX_SHADER);
-		sf_mesh=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
-
-		const char *data=_3vmn_v;//AEReadTextFileCml(AEGLSL_PATH_3VMN_V);
-		if(*data==AE_ERR) return AE_ERR;
-		sv_mesh->ShaderData(&data,1,NULL);
-		data=_3vc_f;//AEReadTextFileCml(AEGLSL_PATH_3VMN_F);
-		if(*data==AE_ERR) return AE_ERR;
-		sf_mesh->ShaderData(&data,1,NULL);
-
-		//Vertex shader
-		sv_mesh->Compile();
-		if(sv_mesh->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: v shader compilation failed:");
-			AEPrintLog(sv_mesh->GetLog());
-			return AE_ERR;
-		}
-		//Fragment shader
-		sf_mesh->Compile();
-		if(sf_mesh->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: f shader compilation failed:");
-			AEPrintLog(sf_mesh->GetLog());
-			return AE_ERR;
-		}
-
-		this->p_3vmn->Attach(sv_mesh);
-		this->p_3vmn->Attach(sf_mesh);
-
-		this->p_3vmn->Link();
-		if(this->p_3vmn->GetLinkStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: program linkage failed:");
-			AEPrintLog(this->p_3vmn->GetLog());
-			return AE_ERR;
-		}
-
-		this->p_3vmn->GetShaderProperties();
-
-		printf("Program: %d;\nShaders: %d,%d\n",p_3vmn->id,sv_mesh->id,sf_mesh->id);
 		return AE_OK;
 	}
 
 	int AEGLSLRenderUnit::InitPostPrograms(void)
 	{
-		//TODO: Make program loading easier, too many duplicative code
-
-		this->p_post_invert=new AEGLSLProgram2vsquarelight;//this->pmanager.NewProgram(); //FIXME Look here for proper creation of basic program
-		AEGLSLShader *sv_mesh,*sf_mesh;
-		sv_mesh=this->pmanager.NewShader(GL_VERTEX_SHADER);
-		sf_mesh=this->pmanager.NewShader(GL_FRAGMENT_SHADER);
-
-		const char **data=AEReadTextFileCml(AEGLSL_PATH_POST_INVERT_V);
-		if(*data==AE_ERR) return AE_ERR;
-		sv_mesh->ShaderData(data,1,NULL);
-		data=AEReadTextFileCml(AEGLSL_PATH_POST_INVERT_F);
-		if(*data==AE_ERR) return AE_ERR;
-		sf_mesh->ShaderData(data,1,NULL);
-
-		//Vertex shader
-		sv_mesh->Compile();
-		if(sv_mesh->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: v shader compilation failed:");
-			AEPrintLog(sv_mesh->GetLog());
-			return AE_ERR;
-		}
-		//Fragment shader
-		sf_mesh->Compile();
-		if(sf_mesh->GetCompileStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: f shader compilation failed:");
-			AEPrintLog(sf_mesh->GetLog());
-			return AE_ERR;
-		}
-
-		this->p_post_invert->Attach(sv_mesh);
-		this->p_post_invert->Attach(sf_mesh);
-
-		this->p_post_invert->Link();
-		if(this->p_post_invert->GetLinkStatus()!=GL_TRUE)
-		{
-			AEPrintLog("err: program linkage failed:");
-			AEPrintLog(this->p_post_invert->GetLog());
-			return AE_ERR;
-		}
-
-		this->p_post_invert->GetShaderProperties();
-
 		return AE_OK;
 	}
 

@@ -231,7 +231,7 @@ namespace aengine
 			const AEMatrix4f4 &projection,
 			AEMesh * mesh,
 			AEMaterial *mat,
-			AELightingCache *lcache)
+			AELightingCache &lcache)
 	{
 		if(!AEGLSLProgram3vmn::BindData(object,camera,projection,mesh,mat))
 			return false;
@@ -244,20 +244,19 @@ namespace aengine
 		else
 			glUniform1i(u_shaded.id,0);
 
-		if(!lcache) return true;
-		int cnt=lcache->arr_length;	//TODO constrain max light number
+		int cnt=lcache.arr_length;	//TODO constrain max light number
 		glUniform1i(u_light_num.id,cnt);
 		if(!cnt) return true;
 
 
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 
-		glUniform1iv(u_lights_type.id,cnt,&lcache->arr_type[0]);
-		glUniform3fv(u_lights_position.id,cnt,(const GLfloat*)&lcache->arr_position[0]);
-		glUniform3fv(u_lights_rotation.id,cnt,(const GLfloat*)&lcache->arr_rotation[0]);
-		glUniform4fv(u_lights_color.id,cnt,(const GLfloat*)&lcache->arr_color[0]);
-		glUniform3fv(u_lights_attenuation.id,cnt,(const GLfloat*)&lcache->arr_attenuation[0]);
-		glUniform2fv(u_lights_spot.id,cnt,(const GLfloat*)&lcache->arr_spot[0]);
+		glUniform1iv(u_lights_type.id,cnt,&lcache.arr_type[0]);
+		glUniform3fv(u_lights_position.id,cnt,(const GLfloat*)&lcache.arr_position[0]);
+		glUniform3fv(u_lights_rotation.id,cnt,(const GLfloat*)&lcache.arr_rotation[0]);
+		glUniform4fv(u_lights_color.id,cnt,(const GLfloat*)&lcache.arr_color[0]);
+		glUniform3fv(u_lights_attenuation.id,cnt,(const GLfloat*)&lcache.arr_attenuation[0]);
+		glUniform2fv(u_lights_spot.id,cnt,(const GLfloat*)&lcache.arr_spot[0]);
 
 		return true;
 	}

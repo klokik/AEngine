@@ -99,7 +99,7 @@ namespace aengine
 				const AEMatrix4f4 &projection,
 				AEMesh * mesh,
 				AEMaterial *mat,
-				AELightingCache *lcache);
+				AELightingCache &lcache);
 		virtual void UnbindData(void);
 	};
 

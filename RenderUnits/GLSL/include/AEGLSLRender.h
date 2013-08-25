@@ -29,7 +29,7 @@ namespace aengine
 		AEGLSLProgram3vc	*p_3vc;
 		AEGLSLProgram3vm	*p_3vm;
 		AEGLSLProgram3vmn	*p_3vmn;
-		// AEGLSLProgram3vctnl *p_3vctnl;
+		AEGLSLProgram3vmnl	*p_3vmnl;
 
 		AEGLSLProgram2vsquarelight *p_post_invert;
 
@@ -63,8 +63,9 @@ namespace aengine
 		virtual void BlitToScreen(void);
 		virtual void PostProcess(AEObjectCamera *camera);
 
-		virtual int Init3vcProgram(void);
-		virtual int Init3vmnProgram(void);
+		int LoadCompileLink(AEGLSLProgram &prog,std::string shader_v,std::string shader_f);
+		// virtual int Init3vcProgram(void);
+		// virtual int Init3vmnProgram(void);
 		virtual int InitPostPrograms(void);
 
 		virtual unsigned int GetGLSLVersion(void);

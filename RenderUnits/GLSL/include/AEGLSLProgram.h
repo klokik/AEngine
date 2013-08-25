@@ -31,8 +31,8 @@ namespace aengine
 
 		AEGLSLShader(uint32_t _type);
 
-		void ShaderData(const char **str,uint32_t count,const int *length);
-		void Compile(void);
+		void ShaderData(std::string data);
+		int Compile(bool quiet=false);
 		int GetCompileStatus(void);
 		std::string GetLog(void);
 
@@ -51,10 +51,10 @@ namespace aengine
 
 		void Use(void);
 
-		void Attach(AEGLSLShader *shd);
-		void Detach(AEGLSLShader *shd);
+		void Attach(AEGLSLShader &shd);
+		void Detach(AEGLSLShader &shd);
 
-		void Link(void);
+		int Link(bool quiet=false);
 		int GetLinkStatus(void);
 		std::string GetLog(void);
 

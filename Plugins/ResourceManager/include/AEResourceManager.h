@@ -1,6 +1,8 @@
 #ifndef AERESOURCEMANAGER_H_
 #define AERESOURCEMANAGER_H_
 
+#include <string>
+
 #include "AEScene.h"
 #include "AEMesh.h"
 
@@ -24,6 +26,8 @@ namespace aengine
 		int SaveSceneState(std::string res_name,AEScene &scene);
 		int LoadScene(std::string res_name,AEScene &scene);
 		int SaveScene(std::string res_name,AEScene &scene);
+
+		std::string LoadString(std::string res_name);
 
 		// int LoadConfig(std::string res_name,AEConfig &config);
 		// int SaveConfig(std::strign res_name,AEConfig &config);
