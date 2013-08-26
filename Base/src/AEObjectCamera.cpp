@@ -13,7 +13,7 @@ AEObjectCamera::AEObjectCamera(void)
 {
 	this->_type=AE_OBJ_CAMERA;
 
-	this->angle=45.0f;
+	this->angle=120.0f;
 	this->focus=0.0f;
 	this->z_near=0.1f;
 	this->z_far=100.0f;
@@ -48,14 +48,15 @@ void AEObjectCamera::CalculateCameraMatrix(bool force)
 
 void AEObjectCamera::CalculateProjectionMatrix(bool force)
 {
+	float r_angle=angle/57.2957795131f;
+
 	if(pmn_recalc||force)
 	{
-		float r=z_near/tan(angle/2);
-		float t=r/ratio;
+		float tg=tan(r_angle/2);
 
 		float p_mtx[16]={
-			z_near/r, 0,0,0,
-			0, z_near/t, 0,0,
+			1/tg ,0,0,0,
+			0, ratio/tg, 0, 0,
 			0,0,-(z_far+z_near)/(z_far-z_near),-1,
 			0,0,-2*z_far*z_near/(z_far-z_near),0
 		};
