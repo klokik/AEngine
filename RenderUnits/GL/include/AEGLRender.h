@@ -66,7 +66,7 @@ namespace aengine
 
 		//*--region cache
 		virtual int CacheObject(AEObject * obj);
-		virtual int CacheTexture(AETexture * tex);
+		virtual int CacheTexture(AETexture &tex);
 		virtual int CacheMaterials(void);
 		virtual int CacheFonts(void);
 

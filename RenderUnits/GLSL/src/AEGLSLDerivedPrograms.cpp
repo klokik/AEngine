@@ -125,8 +125,7 @@ namespace aengine
 		{
 			if(mat->texture->size>0)
 			{
-				// it's useless while using shaders
-				// glEnable(GL_TEXTURE_2D);
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D,mat->texture->id);
 
 				glBindBuffer(GL_ARRAY_BUFFER,mesh->idtcr);//TODO For 3D tex. coords look here
@@ -310,8 +309,6 @@ namespace aengine
 		glEnableVertexAttribArray(a_position.id);
 
 		glUniform2f(u_size.id,size.X,size.Y);
-
-		glEnable(GL_TEXTURE_2D);
 
 		if(glIsTexture(texture0))
 		{

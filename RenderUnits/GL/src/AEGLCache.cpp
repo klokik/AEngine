@@ -66,14 +66,17 @@ namespace aengine
 		switch(obj->type)
 		{
 		case AE_OBJ_MESH:
-			AEPrintLog("\ttype: mesh");
-			try
 			{
-				result&=this->CacheMesh(dynamic_cast<AEObjectMesh*>(obj)->mesh);
-			}
-			catch(...)
-			{
-				AEPrintLog("\t\x1B[31m[FAILED]");
+				AEPrintLog("\ttype: mesh");
+
+				AEObjectMesh *mesh_obj=static_cast<AEObjectMesh*>(obj);
+				result&=this->CacheMesh(mesh_obj->mesh);
+
+				if(mesh_obj->material&&mesh_obj->material->texture)
+				{
+					if(!mesh_obj->material->texture->cached)
+						CacheTexture(*mesh_obj->material->texture);
+				}
 			}
 			break;
 		default:
@@ -88,41 +91,43 @@ namespace aengine
 		return result;
 	}
 
-	int AEGLRenderUnit::CacheTexture(AETexture * tex)
+	int AEGLRenderUnit::CacheTexture(AETexture &tex)
 	{
-		int result=AE_OK;
+		if(tex.size==0)
+			return AE_ERR;
 
-		if(!tex||tex->size<0)
-			result=AE_ERR;
-
-		glGenTextures(1,&tex->id);
-		this->textures.push_back(tex->id);
-		glBindTexture(GL_TEXTURE_2D,tex->id);
+		glGenTextures(1,&tex.id);
+		this->textures.push_back(tex.id);
+		glBindTexture(GL_TEXTURE_2D,tex.id);
 
 		GLenum format=GL_RGB;
-		switch(tex->bpp)
+		switch(tex.bpp)
 		{
+		//case  8:	format=GL_RGBA2;	break;
+		case 16:	format=GL_RGBA4; break;
 		case 24:	format=GL_RGB;	break;
 		case 32:	format=GL_RGBA;	break;
 		}
 
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);//GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
 // #if !defined(AE_NEW_GL_CONTEXT)
-// 		glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
+		// glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
 // #else
-// 		glGenerateMipmap(GL_TEXTURE_2D);
+		// glGenerateMipmap(GL_TEXTURE_2D);
 // #endif
 
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex->width,tex->height,0,format,GL_UNSIGNED_BYTE,tex->data);
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex.width,tex.height,0,format,GL_UNSIGNED_BYTE,tex.data);
 
 		if(glGetError()!=GL_NO_ERROR)
-			result=AE_ERR;
+			return AE_ERR;
 
-		return result;
+		tex.cached=true;
+
+		return AE_OK;
 	}
 
 	int AEGLRenderUnit::CacheMaterials(void)
@@ -133,7 +138,10 @@ namespace aengine
 
 		for(unsigned int q=0;q<this->scene->materials.Count();q++)
 		{
-			result=CacheTexture(this->scene->materials[q]->texture);
+			if(!this->scene->materials[q]->texture)
+				continue;
+
+			result=CacheTexture(*this->scene->materials[q]->texture);
 			if(result!=AE_OK)
 				break;
 		}
@@ -149,7 +157,10 @@ namespace aengine
 
 		for(std::pair<const int,AEFontBitmap> &font:this->scene->fonts.fonts)
 		{
-			result=CacheTexture(font.second.texture);
+			if(!font.second.texture)
+				continue;
+
+			result=CacheTexture(*font.second.texture);
 			if(result!=AE_OK)
 				break;
 		}
