@@ -11,7 +11,8 @@ namespace aengine
 
 	int AEResourceManager::LoadMeshObj(std::string res_name,AEMesh &mesh)
 	{
-		LoadObjFile(mesh,res_name.c_str());
+		std::string file_name=work_directory+res_name;
+		LoadObjFile(mesh,file_name.c_str());
 
 		return AE_OK;
 	}
