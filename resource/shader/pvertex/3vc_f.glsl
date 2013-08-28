@@ -1,4 +1,6 @@
-#version 120
+#version 100
+
+precision highp float;
 
 varying vec4 f_color;
 

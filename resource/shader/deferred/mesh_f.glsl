@@ -1,5 +1,6 @@
-#version 120
+#version 100
 
+precision highp float;
 uniform vec4 u_color;
 
 uniform sampler2D u_texture0;
@@ -17,6 +18,6 @@ void main(void)
 		gl_FragData[0]*=texture2D(u_texture0,f_texcoord0.st);
 	}
 
-	gl_FragData[1] = vec4(f_pos.x,f_pos.y,-f_pos.z,gl_FragCoord.z);
-	gl_FragData[2] = vec4(f_normal,1.0);
+	// gl_FragData[1] = vec4(f_pos.x,f_pos.y,-f_pos.z,gl_FragCoord.z);
+	// gl_FragData[2] = vec4(f_normal,1.0);
 }

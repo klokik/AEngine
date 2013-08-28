@@ -1,4 +1,4 @@
-#version 120
+#version 100
 
 uniform mat4 u_object_matrix;
 uniform mat4 u_camera_matrix;
