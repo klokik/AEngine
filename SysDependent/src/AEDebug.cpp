@@ -2,6 +2,8 @@
 
 //TODO: move to SysDep
 
+aengine::dbgout_stream dbgout;
+
 #if defined(PLATFORM_ANDROID)
 
 #include <android/log.h>
