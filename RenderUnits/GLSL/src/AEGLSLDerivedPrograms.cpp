@@ -111,7 +111,13 @@ namespace aengine
 			col={1.0f,1.0f,1.0f,1.0f};
 		}
 		else
+		{
 			col=mat->diffuse;
+			if(mat->transparent)
+				glEnable(GL_BLEND);
+			else
+				glDisable(GL_BLEND);
+		}
 
 		if(mesh)
 		{
