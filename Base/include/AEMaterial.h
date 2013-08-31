@@ -23,6 +23,7 @@ typedef struct AEMaterial
 	float reflectivity;
 
 	bool shading;
+	bool transparent;
 }AEMaterial;
 
 #endif /* AEMATERIAL_H_ */

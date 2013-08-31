@@ -30,11 +30,12 @@ AEMaterial *AEMaterialManager::New(void)
 	mat->diffuse.R=0.5f; mat->diffuse.G=0.5f; mat->diffuse.B=0.5f; mat->diffuse.A=1.0f;
 	mat->emissive.R=1.0f; mat->emissive.G=1.0f; mat->emissive.B=1.0f; mat->emissive.A=1.0f;
 	mat->specular.R=1.0f; mat->specular.G=1.0f; mat->specular.B=1.0f; mat->specular.A=1.0f;
-	mat->texture=(AETexture*)malloc(sizeof(AETexture));
-	memset(mat->texture,0,sizeof(AETexture));
+	mat->texture=nullptr;//(AETexture*)malloc(sizeof(AETexture));
+	//memset(mat->texture,0,sizeof(AETexture));
 	mat->reflectivity=0;
 	mat->shininess=0.5f;
 	mat->shading=true;
+	mat->transparent=false;
 
 	this->Add(mat);
 	return mat;
