@@ -50,6 +50,7 @@ protected:
 	bool csmn_recalc;
 
 	bool mn_recalc;
+	bool cmn_recalc;
 
 	AEBoundingSphere _bounding_sphere;
 
@@ -102,7 +103,8 @@ public:
 	//Calculates bounding spheres for each element in branch
 	virtual void CalculateBoundingSphere(void);
 
-	const AEVector3f GetAbsPosition(void);
+	AEVector3f GetAbsPosition(void);
+	AEVector3f GetAbsScale(void);
 
 	virtual ~AEObject(void);
 };

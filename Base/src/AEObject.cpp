@@ -37,6 +37,7 @@ AEObject::AEObject(void):
 	this->rmn_recalc=true;
 	this->smn_recalc=true;
 
+	this->cmn_recalc =true;
 	this->ctmn_recalc=true;
 	this->crmn_recalc=true;
 	this->csmn_recalc=true;
@@ -140,6 +141,7 @@ void AEObject::InvalidateTranslate(void)
 	tmn_recalc=true;
 	ctmn_recalc=true;
 	mn_recalc=true;
+	cmn_recalc=true;
 }
 
 void AEObject::InvalidateRotate(void)
@@ -147,6 +149,7 @@ void AEObject::InvalidateRotate(void)
 	rmn_recalc=true;
 	crmn_recalc=true;
 	mn_recalc=true;
+	cmn_recalc=true;
 }
 
 void AEObject::InvalidateScale(void)
@@ -154,6 +157,7 @@ void AEObject::InvalidateScale(void)
 	smn_recalc=true;
 	csmn_recalc=true;
 	mn_recalc=true;
+	cmn_recalc=true;
 }
 
 void AEObject::InvalidateTransform(void)
@@ -208,7 +212,7 @@ void AEObject::CalculateMatrix(bool force)
 
 void AEObject::CalculateCameraMatrix(bool force)
 {
-	if(mn_recalc)
+	if(cmn_recalc)
 	{
 		if(ctmn_recalc)
 		{
@@ -234,7 +238,14 @@ void AEObject::CalculateCameraMatrix(bool force)
 		_wcmatrix=csmatrix*crmatrix;
 		_wcmatrix=_wcmatrix*ctmatrix;
 		if(this->parent)
-			_wcmatrix=_wcmatrix*this->parent->_wcmatrix;
+			_wcmatrix=_wcmatrix*this->parent->GetCameraMatrix();
+
+		cmn_recalc=false;
+
+		for(size_t q=0;q<this->_children.size();q++)
+		{
+			this->_children[q]->cmn_recalc=true;
+		}
 	}
 }
 
@@ -272,10 +283,18 @@ void AEObject::CalculateBoundingSphere(void)
 	this->_bounding_sphere.radius=sqrt(max_rad);
 }
 
-const AEVector3f AEObject::GetAbsPosition(void)
+AEVector3f AEObject::GetAbsPosition(void)
 {
-	if(this->mn_recalc) this->CalculateMatrix();
+	this->CalculateMatrix();
 	AEVector3f vec={_wmatrix[12],_wmatrix[13],_wmatrix[14]};
+
+	return vec;
+}
+
+AEVector3f AEObject::GetAbsScale(void)
+{
+	this->CalculateMatrix();
+	AEVector3f vec={_wmatrix[0],_wmatrix[5],_wmatrix[10]};
 
 	return vec;
 }
