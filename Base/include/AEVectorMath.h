@@ -9,6 +9,7 @@
 #define AEVECTORMATH_H_
 
 #include <math.h>
+#include <string>
 
 #include "AEUnits.h"
 
@@ -62,5 +63,9 @@ T normalize(const T &a)
 {
 	return a/Length(a);
 }
+
+std::ostream &operator<<(std::ostream &os,const AEVector2f vec);
+std::ostream &operator<<(std::ostream &os,const AEVector3f vec);
+std::ostream &operator<<(std::ostream &os,const AEVector4f vec);
 
 #endif /* AEVECTORMATH_H_ */

@@ -5,6 +5,8 @@
  *      Author: klokik
  */
 
+#include <sstream>
+
 #include "AEVectorMath.h"
 
 
@@ -166,4 +168,28 @@ AEVector3f operator-(const AEVector3f &a)
 AEVector4f operator-(const AEVector4f &a)
 {
 	return a*(-1.0f);
+}
+
+std::ostream &operator<<(std::ostream &os,const AEVector2f vec)
+{
+	std::stringstream sstr;
+	sstr<<"("<<vec.X<<","<<vec.Y<<")";
+
+	return (os<<sstr.str());
+}
+
+std::ostream &operator<<(std::ostream &os,const AEVector3f vec)
+{
+	std::stringstream sstr;
+	sstr<<"("<<vec.X<<","<<vec.Y<<","<<vec.Z<<")";
+
+	return (os<<sstr.str());
+}
+
+std::ostream &operator<<(std::ostream &os,const AEVector4f vec)
+{
+	std::stringstream sstr;
+	sstr<<"("<<vec.X<<","<<vec.Y<<","<<vec.Z<<","<<vec.W<<")";
+
+	return (os<<sstr.str());
 }
