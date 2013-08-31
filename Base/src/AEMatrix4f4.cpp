@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <algorithm>
 
 #define fdcos(a) (float)cos(a/57.2957795f)
 #define fdsin(a) (float)sin(a/57.2957795f)
@@ -205,6 +206,16 @@ void AEMatrix4f4::Scale(float x, float y, float z)
 void AEMatrix4f4::Scale(const AEVector3f& vec)
 {
 	this->Scale(vec.X,vec.Y,vec.Z);
+}
+
+void AEMatrix4f4::Transpose(void)
+{
+	for(int q=0;q<3;q++)
+		for(int w=q+1;w<4;w++)
+			std::swap(
+				this->operator()(q,w),
+				this->operator()(w,q)
+			);
 }
 
 AEMatrix4f4::~AEMatrix4f4(void)

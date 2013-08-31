@@ -54,6 +54,8 @@ public:
 	void Scale(float x,float y,float z);
 	void Scale(AEVector3f const &vec);
 
+	void Transpose(void);
+
 	virtual ~AEMatrix4f4(void);
 };
 
