@@ -15,6 +15,9 @@ namespace aengine
 {
 	void AEGLSLRenderUnit::RenderSpritesPersp(void)
 	{
+		if(sprite_mesh.IsInvalid())
+			AEGLRenderUnit::UpdateMeshBuffers(&sprite_mesh);
+
 		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 
 		glDisable(GL_DEPTH_TEST);
@@ -63,6 +66,9 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderSpritesOrtho(void)
 	{
+		if(sprite_mesh.IsInvalid())
+			AEGLRenderUnit::UpdateMeshBuffers(&sprite_mesh);
+
 		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 
 		glDisable(GL_DEPTH_TEST);
