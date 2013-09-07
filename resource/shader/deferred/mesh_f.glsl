@@ -12,7 +12,7 @@ varying vec3 f_pos;
 
 void main(void)
 {
-	gl_FragData[0]=vec4(u_color.rgb,1.0);
+	gl_FragData[0]=u_color;
 	if(u_istextured0!=0)
 	{
 		gl_FragData[0]*=texture2D(u_texture0,f_texcoord0.st);
