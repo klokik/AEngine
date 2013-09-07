@@ -44,6 +44,10 @@ AEVector2f operator*(const AEVector2f &a,const float b);
 AEVector3f operator*(const AEVector3f &a,const float b);
 AEVector4f operator*(const AEVector4f &a,const float b);
 
+AEVector2f operator*(const AEVector2f a,const AEVector2f b);
+AEVector3f operator*(const AEVector3f a,const AEVector3f b);
+AEVector4f operator*(const AEVector4f a,const AEVector4f b);
+
 AEVector2f operator/(const AEVector2f &a,const float b);
 AEVector3f operator/(const AEVector3f &a,const float b);
 AEVector4f operator/(const AEVector4f &a,const float b);

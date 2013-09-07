@@ -120,6 +120,22 @@ AEVector4f operator *(const AEVector4f &a,const float b)
 	return {a.X*b,a.Y*b,a.Z*b,a.W*b};
 }
 
+AEVector2f operator*(const AEVector2f a,const AEVector2f b)
+{
+	return {a.X*b.X,a.Y*b.Y};
+}
+
+AEVector3f operator*(const AEVector3f a,const AEVector3f b)
+{
+	return {a.X*b.X,a.Y*b.Y,a.Z*b.Z};
+}
+
+AEVector4f operator*(const AEVector4f a,const AEVector4f b)
+{
+	return {a.X*b.X,a.Y*b.Y,a.Z*b.Z,a.W*b.W};
+}
+
+
 AEVector2f operator /(const AEVector2f &a,const float b)
 {
 	return {a.X/b,a.Y/b};
