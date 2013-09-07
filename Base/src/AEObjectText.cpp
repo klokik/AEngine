@@ -14,6 +14,6 @@ AEObjectText::AEObjectText(void)
 	this->_type=AE_OBJ_TEXT;
 	this->projection=AE_ORTHOGRAPHIC;
 	this->SetScale(vec3f(16.0f,16.0f,16.0f));
-	this->spacing={1.1f,0.0f,0.0f};
+	this->spacing={1.0f,0.0f,0.0f};
 	this->alignment=AE_CENTER;
 }
