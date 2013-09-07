@@ -5,6 +5,8 @@
  *      Author: klokik
  */
 
+#include <algorithm>
+
 #include "AEGLHeader.h"
 #include "AEGLSLRender.h"
 #include "AEVectorMath.h"
@@ -25,6 +27,28 @@ namespace aengine
 		p_3vm->Use();
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
+
+		// sort sprites by distance from camera and draw in reverse order
+		class d_sorter
+		{
+		protected:
+			AEObject *obj;
+		public:
+			d_sorter(AEObject *cam)
+			{
+				obj = cam;
+			}
+
+			bool operator()(AEObjectSprite *a,AEObjectSprite *b)
+			{
+				float l_a = Length(a->GetAbsPosition()-obj->GetAbsPosition());
+				float l_b = Length(b->GetAbsPosition()-obj->GetAbsPosition());
+				return l_a>l_b;
+			}
+		};
+
+		d_sorter sorter_inst(curCam);
+		std::sort(type_cache.sprites_persp.begin(),type_cache.sprites_persp.end(),sorter_inst);
 
 		AEMatrix4f4 mtx;
 		for(AEObjectSprite *obj:type_cache.sprites_persp)
