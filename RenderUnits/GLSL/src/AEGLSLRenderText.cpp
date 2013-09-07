@@ -66,8 +66,8 @@ namespace aengine
 			// glTranslatef(obj->spacing.X,obj->spacing.Y,obj->spacing.Z);
 		}
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 		p_btext->UnbindData();
+
 		glUseProgram(0);
 	}
 

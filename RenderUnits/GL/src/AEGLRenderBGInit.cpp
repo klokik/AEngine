@@ -10,6 +10,7 @@
  *      For rendering object look AEGLRender[Object type].cpp files
  */
 
+#include <string.h>
 
 #include "AEGLHeader.h"
 #include "AEGLRender.h"
@@ -57,7 +58,6 @@ namespace aengine
 		glBindBuffer(GL_ARRAY_BUFFER,empty_mesh.idnrm);
 		glBufferData(GL_ARRAY_BUFFER,sizeof(AEColor)*6,col,GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		return AE_OK;
 	}
@@ -90,22 +90,17 @@ namespace aengine
 
 		unsigned int fce[]={ 0, 1, 2, 2, 3, 0 };
 
-		glGenBuffers(1,&sprite_mesh.idvtx);
-		glGenBuffers(1,&sprite_mesh.idnrm);
-		glGenBuffers(1,&sprite_mesh.idtcr);
-		glGenBuffers(1,&sprite_mesh.idfce);
+		sprite_mesh.vtx=(AEVertexf*)malloc(sizeof(vtx));
+		sprite_mesh.tcr=(AETexCoord*)malloc(sizeof(tcr));
+		sprite_mesh.nrm=(AEVector3f*)malloc(sizeof(nrm));
+		sprite_mesh.fce=(AETriangle*)malloc(sizeof(fce));
 
-		glBindBuffer(GL_ARRAY_BUFFER,sprite_mesh.idvtx);
-		glBufferData(GL_ARRAY_BUFFER,sizeof(AEVertexf)*4, vtx,GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER,sprite_mesh.idnrm);
-		glBufferData(GL_ARRAY_BUFFER,sizeof(AEVector3f)*4, nrm,GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER,sprite_mesh.idtcr);
-		glBufferData(GL_ARRAY_BUFFER,sizeof(AETexCoord)*4,tcr,GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
+		memcpy(sprite_mesh.vtx,vtx,sizeof(vtx));
+		memcpy(sprite_mesh.tcr,tcr,sizeof(tcr));
+		memcpy(sprite_mesh.nrm,nrm,sizeof(nrm));
+		memcpy(sprite_mesh.fce,fce,sizeof(fce));
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*6,fce,GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+		AEGLRenderUnit::CacheMesh(&sprite_mesh);
 
 		return AE_OK;
 	}
@@ -135,10 +130,8 @@ namespace aengine
 
 		glBindBuffer(GL_ARRAY_BUFFER,lcube_mesh.idvtx);
 		glBufferData(GL_ARRAY_BUFFER,sizeof(AEVertexf)*8,vtx,GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,lcube_mesh.idind);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(unsigned int)*24,ind,GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		return AE_OK;
 	}
@@ -168,7 +161,6 @@ namespace aengine
 		glBindBuffer(GL_ARRAY_BUFFER,tetra_mesh.idvtx);
 		glBufferData(GL_ARRAY_BUFFER,sizeof(AEVertexf)*12,vtx,GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		return AE_OK;
 	}

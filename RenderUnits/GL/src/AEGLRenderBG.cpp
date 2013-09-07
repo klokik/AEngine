@@ -26,7 +26,6 @@ namespace aengine
 		glVertexPointer(3,GL_FLOAT,0,0);
 		glBindBuffer(GL_ARRAY_BUFFER,empty_mesh.idnrm);
 		glColorPointer(4,GL_FLOAT,0,0);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		glDrawArrays(GL_LINES,0,6);
 
@@ -52,12 +51,10 @@ namespace aengine
 
 		glBindBuffer(GL_ARRAY_BUFFER,lcube_mesh.idvtx);
 		glVertexPointer(3,GL_FLOAT,0,0);
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,lcube_mesh.idind);
 
 		glDrawElements(GL_LINES,24,GL_UNSIGNED_INT,0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 

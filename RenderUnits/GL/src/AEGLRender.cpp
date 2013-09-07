@@ -95,6 +95,9 @@ namespace aengine
 
 	void AEGLRenderUnit::QueueObject(AEObject * obj)
 	{
+		if(!obj->visible)
+			return;
+
 		switch(obj->type)
 		{
 		case AE_OBJ_EMPTY:
@@ -180,13 +183,19 @@ namespace aengine
 		}
 
 		this->RenderMeshes();
+		CheckError();
 		this->RenderEmpties();
+		CheckError();
 		this->RenderJoints();
+		CheckError();
 
 		this->RenderSpritesPersp();
+		CheckError();
 		this->RenderSpritesOrtho();
+		CheckError();
 
 		this->RenderTexts();
+		CheckError();
 	}
 
 	void AEGLRenderUnit::Set2DMode(void)

@@ -54,9 +54,9 @@ namespace aengine
 
 			glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 		}
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		p_3vm->UnbindData();
+		CheckError();
 
 		glUseProgram(0);
 	}
@@ -84,7 +84,6 @@ namespace aengine
 
 			glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 		}
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		p_3vm->UnbindData();
 

@@ -58,8 +58,6 @@ namespace aengine
 			glEnableVertexAttribArray(a_color.id);
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER,0);
-
 		glUniformMatrix4fv(u_object_matrix.id,1,false,object.ToArray());
 		glUniformMatrix4fv(u_camera_matrix.id,1,false,camera.ToArray());
 		glUniformMatrix4fv(u_projection_matrix.id,1,false,projection.ToArray());
@@ -72,13 +70,20 @@ namespace aengine
 	void AEGLSLProgram3vc::UnbindData(void)
 	{
 		int result;
-		glGetVertexAttribiv(a_vertex.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
-		if(result)
-			glDisableVertexAttribArray(a_vertex.id);
 
-		glGetVertexAttribiv(a_color.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
-		if(result)
-			glDisableVertexAttribArray(a_color.id);
+		if(a_vertex.id!=-1)
+		{
+			glGetVertexAttribiv(a_vertex.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+			if(result)
+				glDisableVertexAttribArray(a_vertex.id);
+		}
+
+		if(a_color.id!=-1)
+		{
+			glGetVertexAttribiv(a_color.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+			if(result)
+				glDisableVertexAttribArray(a_color.id);
+		}
 	}
 
 	AEGLSLProgram3vm::AEGLSLProgram3vm(void)
@@ -109,6 +114,7 @@ namespace aengine
 		if(mat==NULL)
 		{
 			col={1.0f,1.0f,1.0f,1.0f};
+			glDisable(GL_BLEND);
 		}
 		else
 		{
@@ -145,8 +151,6 @@ namespace aengine
 			}
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER,0);
-
 		glUniform1i(u_istextured0.id,0);
 		return true;	//Return true if geometry is OK
 	}
@@ -156,9 +160,13 @@ namespace aengine
 		AEGLSLProgram3vc::UnbindData();
 
 		int result;
-		glGetVertexAttribiv(a_texcoord0.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
-		if(result)
-			glDisableVertexAttribArray(a_texcoord0.id);
+
+		if(a_texcoord0.id!=-1)
+		{
+			glGetVertexAttribiv(a_texcoord0.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+			if(result)
+				glDisableVertexAttribArray(a_texcoord0.id);
+		}
 	}
 
 	AEGLSLProgram3vmn::AEGLSLProgram3vmn(void)
@@ -197,9 +205,12 @@ namespace aengine
 		AEGLSLProgram3vm::UnbindData();
 
 		int result;
-		glGetVertexAttribiv(a_normal.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
-		if(result)
-			glDisableVertexAttribArray(a_normal.id);
+		if(a_normal.id!=-1)
+		{
+			glGetVertexAttribiv(a_normal.id,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&result);
+			if(result)
+				glDisableVertexAttribArray(a_normal.id);
+		}
 	}
 
 	AEGLSLProgram3vmnl::AEGLSLProgram3vmnl(void)
@@ -253,8 +264,6 @@ namespace aengine
 		glUniform1i(u_light_num.id,cnt);
 		if(!cnt) return true;
 
-
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		glUniform1iv(u_lights_type.id,cnt,&lcache.arr_type[0]);
 		glUniform3fv(u_lights_position.id,cnt,(const GLfloat*)&lcache.arr_position[0]);
@@ -412,8 +421,6 @@ namespace aengine
 		glUniform1i(u_light_num.id,cnt);
 		if(!cnt) return true;
 
-
-		glBindBuffer(GL_ARRAY_BUFFER,0);
 
 		glUniform1iv(u_lights_type.id,cnt,&lcache->arr_type[0]);
 		glUniform3fv(u_lights_position.id,cnt,(const GLfloat*)&lcache->arr_position[0]);
