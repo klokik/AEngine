@@ -18,7 +18,13 @@ namespace aengine
 		p_3vc->Use();
 
 		AEColor white={1.0f,1.0f,1.0f,1.0f};
-		p_3vc->BindData(obj->GetWorldMatrix(),cammatrix,prjmatrix,empty_mesh.idvtx,empty_mesh.idnrm,white);
+		p_3vc->BindData(
+			obj->GetWorldMatrix(),
+			obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
+			prjmatrix,
+			empty_mesh.idvtx,
+			empty_mesh.idnrm,
+			white);
 
 		glDrawArrays(GL_LINES,0,6);
 
