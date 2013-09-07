@@ -53,17 +53,16 @@ AEMesh AEMesh::Clone(void)
 
 void AEMesh::CloneFrom(AEMesh &mesh)
 {
-
 	if(mesh.vtxcount!=vtxcount||
 		mesh.fcecount!=fcecount||
 		mesh.tcrcount!=tcrcount||
 		mesh.nrmcount!=nrmcount)
 	{
 		this->Free();
-		vtx = (AEVertexf*)malloc(sizeof(AEVertexf)*mesh.vtxcount);
-		fce = (AETriangle*)malloc(sizeof(AETriangle)*mesh.fcecount);
-		tcr = (AETexCoord*)malloc(sizeof(AETexCoord)*mesh.tcrcount);
-		nrm = (AEVector3f*)malloc(sizeof(AEVector3f)*mesh.nrmcount);
+		if(mesh.vtxcount)	vtx = (AEVertexf*)malloc(sizeof(AEVertexf)*mesh.vtxcount);
+		if(mesh.fcecount)	fce = (AETriangle*)malloc(sizeof(AETriangle)*mesh.fcecount);
+		if(mesh.tcrcount)	tcr = (AETexCoord*)malloc(sizeof(AETexCoord)*mesh.tcrcount);
+		if(mesh.nrmcount)	nrm = (AEVector3f*)malloc(sizeof(AEVector3f)*mesh.nrmcount);
 
 		vtxcount = mesh.vtxcount;
 		fcecount = mesh.fcecount;
@@ -71,10 +70,10 @@ void AEMesh::CloneFrom(AEMesh &mesh)
 		nrmcount = mesh.tcrcount;
 	}
 
-	memcpy(vtx,mesh.vtx,sizeof(AEVertexf)*vtxcount);
-	memcpy(fce,mesh.fce,sizeof(AETriangle)*fcecount);
-	memcpy(tcr,mesh.tcr,sizeof(AETexCoord)*tcrcount);
-	memcpy(nrm,mesh.nrm,sizeof(AEVector3f)*nrmcount);
+	if(vtxcount)	memcpy(vtx,mesh.vtx,sizeof(AEVertexf)*vtxcount);
+	if(fcecount)	memcpy(fce,mesh.fce,sizeof(AETriangle)*fcecount);
+	if(tcrcount)	memcpy(tcr,mesh.tcr,sizeof(AETexCoord)*tcrcount);
+	if(nrmcount)	memcpy(nrm,mesh.nrm,sizeof(AEVector3f)*nrmcount);
 }
 
 AEMesh &AEMesh::operator = (AEMesh &mesh)
