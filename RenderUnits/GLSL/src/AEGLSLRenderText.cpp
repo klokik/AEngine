@@ -34,18 +34,37 @@ namespace aengine
 		}
 
 		AEMatrix4f4 m4_text;
-		AEVector3f shift=obj->spacing*obj->text.length()*lambda;
+		AEVector3f shift=obj->spacing*(obj->text.length()-1)*lambda;
 		m4_text.Translate(shift);
 
 		AEMaterial mat;
 		mat.texture=font->texture;
 		mat.diffuse.vec=vec4f(1.0f,1.0f,1.0f,1.0f);
+		mat.transparent=true;
 		mat.shading=false;
 
 		AEMatrix4f4 m4_ow(obj->GetWorldMatrix());
 
-		for(char q:obj->text)
+		AETexCoord *orig_tcr=sprite_mesh.tcr;
+
+		AETexCoord tcr[4];
+
+		sprite_mesh.tcr=tcr;
+
+		for(char i:obj->text)
 		{
+			unsigned char q = static_cast<unsigned char>(i);
+
+			float d_hx = 1/16.0f;
+			Vec3f lc = vec3f(q%font->width,q/font->height,0.0f)*d_hx;
+
+			tcr[0].vec=lc+vec3f(0.0f,0.0f,0.0f);
+			tcr[1].vec=lc+vec3f(d_hx,0.0f,0.0f);
+			tcr[2].vec=lc+vec3f(d_hx,d_hx,0.0f);
+			tcr[3].vec=lc+vec3f(0.0f,d_hx,0.0f);
+			sprite_mesh.Invalidate(AE_UPDATE_TEXCOORD);
+			AEGLSLRenderUnit::UpdateMeshBuffers(&sprite_mesh);
+
 			p_btext->BindData(
 				m4_ow*m4_text,
 				identity,
@@ -57,18 +76,14 @@ namespace aengine
 			glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
 
 			m4_text.Translate(obj->spacing);
-			// glMatrixMode(GL_TEXTURE);
-			// glLoadIdentity();
-			// glScalef(1.0f/font->width,1.0f/font->height,1.0f);
-			// glTranslatef(q%font->width,q/font->height,0.0f);
-			// glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
-			// glMatrixMode(GL_MODELVIEW);
-			// glTranslatef(obj->spacing.X,obj->spacing.Y,obj->spacing.Z);
 		}
 
 		p_btext->UnbindData();
 
 		glUseProgram(0);
+
+		sprite_mesh.tcr=orig_tcr;
+		sprite_mesh.Invalidate(AE_UPDATE_TEXCOORD);
 	}
 
 	void AEGLSLRenderUnit::RenderTexts(void)
