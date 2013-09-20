@@ -19,4 +19,4 @@ add_library(aengine_base_static $<TARGET_OBJECTS:aengine_base> $<TARGET_OBJECTS:
 set(AE_LINK_COMPONENTS ${AE_LINK_COMPONENTS} aengine_base_static CACHE INTERNAL "")
 
 #add following as option
-set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} png CACHE INTERNAL "")
+# set(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} png CACHE INTERNAL "")

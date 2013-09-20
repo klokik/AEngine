@@ -34,7 +34,7 @@ namespace aengine
 
 		if_str.read(header,header_size);
 
-		if(png_sig_cmp((png_const_bytep)header,0,header_size))
+		if(png_sig_cmp((png_bytep)header,0,header_size))
 		{
 			AEPrintLog("[read_png_file] File \""+file_name+"\" is not recognized as a PNG file");
 			return AE_ERR;
