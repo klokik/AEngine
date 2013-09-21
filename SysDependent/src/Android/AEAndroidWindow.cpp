@@ -163,14 +163,27 @@ namespace aengine
 			last_x=x;
 			last_y=y;
 
-			if((AMOTION_EVENT_ACTION_DOWN|AMOTION_EVENT_ACTION_POINTER_DOWN)&AMotionEvent_getAction(event))
+			switch(AMotionEvent_getAction(event))
 			{
+			case AMOTION_EVENT_ACTION_DOWN:
+				LOGW("Action DOWN");
 				param[2]=2;
 				param[3]=0;
 				wnd->CallEvent(AE_EVENT_MOUSEDOWN,param);
-			}
-			if(AMotionEvent_getAction(event)&AMOTION_EVENT_ACTION_MOVE)
+				break;
+
+			case AMOTION_EVENT_ACTION_UP:
+				LOGW("Action UP");
+				param[2]=2;
+				param[3]=0;
+				wnd->CallEvent(AE_EVENT_MOUSEUP,param);
+				break;
+
+			case AMOTION_EVENT_ACTION_MOVE:
+				LOGW("Action MOVE");
 				wnd->CallEvent(AE_EVENT_MOUSEMOVE,param);
+				break;
+			}
 		}
 		else if(AInputEvent_getType(event)==AINPUT_EVENT_TYPE_KEY)
 		{
