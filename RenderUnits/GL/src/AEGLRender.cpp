@@ -184,7 +184,7 @@ namespace aengine
 
 		this->RenderMeshes();
 		CheckError();
-		this->RenderEmpties();
+		// this->RenderEmpties();
 		CheckError();
 		this->RenderJoints();
 		CheckError();
