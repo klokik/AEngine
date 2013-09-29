@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <sstream>
+
 #include "AEGLSLRender.h"
 #include "AEVectorMath.h"
 #include "AEDebug.h"
@@ -25,16 +28,21 @@ namespace aengine
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sprite_mesh.idfce);
 
-		float lambda=0;
-		switch(obj->alignment)
+		float char_lambda=0;
+		float line_lambda=-0.5f;
+		switch(obj->char_alignment)
 		{
-		case AE_CENTER: lambda=-0.5f; break;
-		case AE_LEFT: lambda=0.0f; break;
-		case AE_RIGHT: lambda=-1.0f; break;
+		case AE_CENTER: char_lambda=-0.5f; break;
+		case AE_LEFT: char_lambda=0.0f; break;
+		case AE_RIGHT: char_lambda=-1.0f; break;
 		}
+		// TODO: align lines the same way as chars
 
 		AEMatrix4f4 m4_text;
-		AEVector3f shift=obj->spacing*(obj->text.length()-1)*lambda;
+		size_t lines=std::count(obj->text.begin(),obj->text.end(),'\n');
+		AEVector3f shift=
+//			obj->char_spacing*(obj->text.length()-1)*char_lambda+	// chars
+			obj->line_spacing*(lines)*line_lambda;				// lines
 		m4_text.Translate(shift);
 
 		AEMaterial mat;
@@ -51,31 +59,44 @@ namespace aengine
 
 		sprite_mesh.tcr=tcr;
 
-		for(char i:obj->text)
+		std::stringstream str_text(obj->text);
+		std::string line;
+		size_t line_num = 0;
+		while(std::getline(str_text,line))
 		{
-			unsigned char q = static_cast<unsigned char>(i);
+			m4_text.SetIdentity();
+			Vec3f shift=
+				obj->char_spacing*(line.length()-1)*char_lambda+
+				obj->line_spacing*(lines*line_lambda+line_num);
+			m4_text.Translate(shift);
+			line_num++;
 
-			float d_hx = 1/16.0f;
-			Vec3f lc = vec3f(q%font->width,q/font->height,0.0f)*d_hx;
+			for(char i:line)
+			{
+				unsigned char q = static_cast<unsigned char>(i);
 
-			tcr[0].vec=lc+vec3f(0.0f,0.0f,0.0f);
-			tcr[1].vec=lc+vec3f(d_hx,0.0f,0.0f);
-			tcr[2].vec=lc+vec3f(d_hx,d_hx,0.0f);
-			tcr[3].vec=lc+vec3f(0.0f,d_hx,0.0f);
-			sprite_mesh.Invalidate(AE_UPDATE_TEXCOORD);
-			AEGLSLRenderUnit::UpdateMeshBuffers(&sprite_mesh);
+				float d_hx = 1/16.0f;
+				Vec3f lc = vec3f(q%font->width,q/font->height,0.0f)*d_hx;
 
-			p_btext->BindData(
-				m4_ow*m4_text,
-				identity,
-				orthomatrix,
-				&this->sprite_mesh,
-				&mat
-			);
+				tcr[0].vec=lc+vec3f(0.0f,0.0f,0.0f);
+				tcr[1].vec=lc+vec3f(d_hx,0.0f,0.0f);
+				tcr[2].vec=lc+vec3f(d_hx,d_hx,0.0f);
+				tcr[3].vec=lc+vec3f(0.0f,d_hx,0.0f);
+				sprite_mesh.Invalidate(AE_UPDATE_TEXCOORD);
+				AEGLSLRenderUnit::UpdateMeshBuffers(&sprite_mesh);
 
-			glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
+				p_btext->BindData(
+					m4_ow*m4_text,
+					identity,
+					orthomatrix,
+					&this->sprite_mesh,
+					&mat
+				);
 
-			m4_text.Translate(obj->spacing);
+				glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
+
+				m4_text.Translate(obj->char_spacing);
+			}
 		}
 
 		p_btext->UnbindData();

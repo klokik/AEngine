@@ -20,8 +20,10 @@ public:
 
 	std::string text;
 
-	AEVector3f spacing;
-	unsigned int alignment;
+	AEVector3f char_spacing;
+	AEVector3f line_spacing;
+	unsigned int char_alignment;
+	unsigned int line_alignment;
 };
 
 #endif /* AEOBJECTTEXT_H_ */
