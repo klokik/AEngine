@@ -22,9 +22,9 @@ attribute vec3 a_vertex;
 attribute vec3 a_normal;
 attribute vec2 a_texcoord0;
 
-// varying vec3 f_normal;
+varying vec3 f_normal;
 varying vec2 f_texcoord0;
-//varying vec3 f_pos;
+varying vec3 f_pos;
 //varying vec3 f_eyevec;
 varying vec3 f_light;
 
@@ -47,7 +47,8 @@ void main(void)
 void passData(void)
 {
 	f_texcoord0=a_texcoord0;
-	// f_normal=mat3x3(u_camera_matrix*u_object_matrix)*a_normal;
+	//f_normal=mat3x3(u_camera_matrix*u_object_matrix)*a_normal;
+	f_pos=(u_camera_matrix*pos).xyz;
 }
 
 void setLighting(void)
@@ -55,10 +56,16 @@ void setLighting(void)
 	vec3 r_color=vec3(0,0,0);
 
 	// vec3 N=normalize(mat3x3(u_camera_matrix*u_object_matrix)*a_normal);
-	f_light=vec3(0.5);//normalize(N)/2+0.5;
-	return;
+	//f_light=vec3(1.0);//normalize(N)/2+0.5;
+//	f_light=vec3(0.5)+normalize(a_normal)*0.5;
+//	return;
 
-	vec3 N=normalize((u_camera_matrix*u_object_matrix*vec4(a_normal,1.0)).xyz);
+	vec3 N=normalize((u_camera_matrix*u_object_matrix*vec4(a_normal,0.0)).xyz);
+	f_light = vec3(0.2+dot(N,normalize(vec3(0.5,0.4,1.0)))*0.8);
+	f_normal = N;
+//	f_specular = vec3(pow(dot(N,normalize((u_camera_matrix*pos).xyz)),50.0)*0.8);
+
+	return;
 
 	for(int q=0;q<u_light_num;q++)
 	{
