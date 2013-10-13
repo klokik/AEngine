@@ -8,12 +8,10 @@
 #include "AEObjectEmpty.h"
 
 
-AEObjectEmpty::AEObjectEmpty()
+namespace aengine
 {
-	this->_type=AE_OBJ_EMPTY;
+	AEObjectEmpty::AEObjectEmpty()
+	{
+		this->_type=AE_OBJ_EMPTY;
+	}
 }
-
-AEObjectEmpty::~AEObjectEmpty()
-{
-}
-

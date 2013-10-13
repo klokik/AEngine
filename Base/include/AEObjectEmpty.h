@@ -10,12 +10,14 @@
 
 #include "AEObject.h"
 
-class AEObjectEmpty: public AEObject
-{
-public:
-	AEObjectEmpty();
 
-	virtual ~AEObjectEmpty();
-};
+namespace aengine
+{
+	class AEObjectEmpty: public AEObject
+	{
+	public:
+		AEObjectEmpty();
+	};
+}
 
 #endif /* AEOBJECTEMPTY_H_ */

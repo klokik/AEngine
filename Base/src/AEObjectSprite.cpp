@@ -8,15 +8,17 @@
 #include "AEObjectSprite.h"
 
 
-AEObjectSprite::AEObjectSprite()
+namespace aengine
 {
-	this->_type=AE_OBJ_SPRITE;
-	this->projection=AE_ORTHOGRAPHIC;
-	this->material=NULL;
-	this->tcr_usedefault=true;
-}
+	AEObjectSprite::AEObjectSprite()
+	{
+		this->_type=AE_OBJ_SPRITE;
+		this->projection=AE_ORTHOGRAPHIC;
+		this->material=NULL;
+		this->tcr_usedefault=true;
+	}
 
-AEObjectSprite::~AEObjectSprite()
-{
+	AEObjectSprite::~AEObjectSprite()
+	{
+	}
 }
-

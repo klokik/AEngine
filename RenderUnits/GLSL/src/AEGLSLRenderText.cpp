@@ -43,7 +43,7 @@ namespace aengine
 		AEVector3f shift=
 //			obj->char_spacing*(obj->text.length()-1)*char_lambda+	// chars
 			obj->line_spacing*(lines)*line_lambda;				// lines
-		m4_text.Translate(shift);
+		m4_text=m4_text.Translate(shift);
 
 		AEMaterial mat;
 		mat.texture=font->texture;
@@ -64,11 +64,10 @@ namespace aengine
 		size_t line_num = 0;
 		while(std::getline(str_text,line))
 		{
-			m4_text.SetIdentity();
 			Vec3f shift=
 				obj->char_spacing*(line.length()-1)*char_lambda+
 				obj->line_spacing*(lines*line_lambda+line_num);
-			m4_text.Translate(shift);
+			m4_text=AEMatrix4f4().Translate(shift);
 			line_num++;
 
 			for(char i:line)
@@ -95,7 +94,7 @@ namespace aengine
 
 				glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
 
-				m4_text.Translate(obj->char_spacing);
+				m4_text=m4_text.Translate(obj->char_spacing);
 			}
 		}
 

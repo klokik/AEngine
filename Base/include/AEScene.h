@@ -18,26 +18,29 @@
 #include "AEObjectLight.h"
 
 
-class AEScene
+namespace aengine
 {
-protected:
-	//std::vector<AEObjectLight*> lights;
+	class AEScene
+	{
+	protected:
+		//std::vector<AEObjectLight*> lights;
 
-public:
-	std::vector<AEObject*> objects;
+	public:
+		std::vector<AEObject*> objects;
 
-	AEMaterialManager materials;
-	AETimelineManager animations;
-	AEFontManager fonts;
+		AEMaterialManager materials;
+		AETimelineManager animations;
+		AEFontManager fonts;
 
-	AEScene(void);
+		AEScene(void);
 
-	void AddObject(AEObject *obj);
-	void RemoveObject(AEObject *obj);
+		void AddObject(AEObject *obj);
+		void RemoveObject(AEObject *obj);
 
-	AEObject *GetObject(std::string name);
+		AEObject *GetObject(std::string name);
 
-	virtual ~AEScene(void);
-};
+		virtual ~AEScene(void);
+	};
+}
 
 #endif /* AESCENE_H_ */

@@ -13,17 +13,20 @@
 #include "AEObject.h"
 
 
-class AEObjectText: public AEObject
+namespace aengine
 {
-public:
-	AEObjectText(void);
+	class AEObjectText: public AEObject
+	{
+	public:
+		AEObjectText(void);
 
-	std::string text;
+		std::string text;
 
-	AEVector3f char_spacing;
-	AEVector3f line_spacing;
-	unsigned int char_alignment;
-	unsigned int line_alignment;
-};
+		AEVector3f char_spacing;
+		AEVector3f line_spacing;
+		unsigned int char_alignment;
+		unsigned int line_alignment;
+	};
+}
 
 #endif /* AEOBJECTTEXT_H_ */

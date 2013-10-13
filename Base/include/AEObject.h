@@ -17,96 +17,77 @@
 #include "AEMatrix4f4.h"
 #include "AEBoundingSphere.h"
 
-class AEObject
+
+namespace aengine
 {
-protected:
-	AEObject *_parent;
+	class AEObject
+	{
+	protected:
+		AEObject *_parent;
 
-	std::vector<AEObject*> _children;
-	AE_OBJ_TYPE _type;
+		std::vector<AEObject*> _children;
+		AE_OBJ_TYPE _type;
 
-	AEVector3f _translate;
-	AEVector3f _rotate;
-	AEVector3f _scale;
+		AEVector3f _translate;
+		AEVector3f _rotate;
+		AEVector3f _scale;
 
-	AEMatrix4f4 tmatrix;	//Translate matrix
-	AEMatrix4f4 rmatrix;	//Rotate matrix
-	AEMatrix4f4 smatrix;	//Scale matrix
+		AEMatrix4f4 _matrix;	//object matrix
+		AEMatrix4f4 _wmatrix;	//world matrix
 
-	AEMatrix4f4 ctmatrix;	//Camera translate matrix
-	AEMatrix4f4 crmatrix;	//Camera rotate matrix
-	AEMatrix4f4 csmatrix;	//Camera scale matrix
+		bool mn_recalc;
 
-	AEMatrix4f4 _matrix;	//smatrix*tmatrix*rmatrix
-	AEMatrix4f4 _wmatrix;	//parent->wmatrix*this->wmatrix
-	AEMatrix4f4 _wcmatrix;	//world2camera matrix
+		AEBoundingSphere _bounding_sphere;
 
-	bool tmn_recalc;
-	bool rmn_recalc;
-	bool smn_recalc;
+	public:
+		std::string name;
+		
+		int projection;	//either AE_ORTHOGRAPHIC or AE_PERSPECTIVE
 
-	bool ctmn_recalc;	//Camera matrix recalculations
-	bool crmn_recalc;
-	bool csmn_recalc;
+		bool visible;
 
-	bool mn_recalc;
-	bool cmn_recalc;
+		const AE_OBJ_TYPE &type;
 
-	AEBoundingSphere _bounding_sphere;
+		const AEVector3f &translate;
+		const AEVector3f &rotate;
+		const AEVector3f &scale;
 
-public:
-	std::string name;
-	
-	int projection;	//either AE_ORTHOGRAPHIC or AE_PERSPECTIVE
+		const std::vector<AEObject*> &children;
+		AEObject * const &parent;
 
-	bool visible;
+		const AEBoundingSphere &bounding_sphere;
 
-	const AE_OBJ_TYPE &type;
+		AEObject(void);
 
-	const AEVector3f &translate;
-	const AEVector3f &rotate;
-	const AEVector3f &scale;
+		void AddChild(AEObject* child);
+		void RemoveChild(AEObject* child);
 
-	const std::vector<AEObject*> &children;
-	AEObject * const &parent;
+		virtual void Move(AEVector3f vec);
 
-	const AEBoundingSphere &bounding_sphere;
+		void RelTranslate(AEVector3f vec);
+		void SetTranslate(AEVector3f vec);
 
-	AEObject(void);
+		void RelRotate(AEVector3f vec);
+		void SetRotate(AEVector3f vec);
 
-	void AddChild(AEObject* child);
-	void RemoveChild(AEObject* child);
+		void RelScale(AEVector3f vec);
+		void SetScale(AEVector3f vec);
 
-	virtual void Move(AEVector3f vec);
+		virtual void InvalidateTransform(void);
 
-	void RelTranslate(AEVector3f vec);
-	void SetTranslate(AEVector3f vec);
+		virtual void CalculateMatrix(bool force=false);
 
-	void RelRotate(AEVector3f vec);
-	void SetRotate(AEVector3f vec);
+		const AEMatrix4f4 &GetMatrix(void);
+		const AEMatrix4f4 &GetWorldMatrix(void);
 
-	void RelScale(AEVector3f vec);
-	void SetScale(AEVector3f vec);
+		//Calculates bounding spheres for each element in branch
+		virtual void CalculateBoundingSphere(void);
 
-	void InvalidateTranslate(void);
-	void InvalidateRotate(void);
-	void InvalidateScale(void);
-	void InvalidateTransform(void);
+		AEVector3f GetAbsPosition(void);
+		AEVector3f GetAbsScale(void);
 
-	virtual void CalculateMatrix(bool force=false);
-	virtual void CalculateCameraMatrix(bool force=false);
-
-	const AEMatrix4f4 &GetMatrix(void);
-	const AEMatrix4f4 &GetWorldMatrix(void);
-	const AEMatrix4f4 &GetCameraMatrix(void);
-
-	//Calculates bounding spheres for each element in branch
-	virtual void CalculateBoundingSphere(void);
-
-	AEVector3f GetAbsPosition(void);
-	AEVector3f GetAbsScale(void);
-
-	virtual ~AEObject(void);
-};
+		virtual ~AEObject(void);
+	};
+}
 
 #endif /* AEOBJECT_H_ */

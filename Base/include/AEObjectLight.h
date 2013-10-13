@@ -11,21 +11,25 @@
 #include "AEUnits.h"
 #include "AEObject.h"
 
-class AEObjectLight: public AEObject
+
+namespace aengine
 {
-private:
-	void Init(void);
+	class AEObjectLight: public AEObject
+	{
+	private:
+		void Init(void);
 
-public:
-	AEObjectLight(void);
-	AEObjectLight(AE_LIGHT_TYPE ltype);
+	public:
+		AEObjectLight(void);
+		AEObjectLight(AE_LIGHT_TYPE ltype);
 
-	AE_LIGHT_TYPE light_type;
-	AEColor color;		//Alpha component is used as intensity
-	AEVector3f attenuation; //constant,linear,square
-	AEVector2f spot;
+		AE_LIGHT_TYPE light_type;
+		AEColor color;		//Alpha component is used as intensity
+		AEVector3f attenuation; //constant,linear,square
+		AEVector2f spot;
 
-	virtual ~AEObjectLight(void);
-};
+		virtual ~AEObjectLight(void);
+	};
+}
 
 #endif /* AEOBJECTLIGHT_H_ */

@@ -15,6 +15,9 @@
 #include "AEScene.h"
 #include "AEObjectCamera.h"
 
+// TODO: wrap render engines into namespace
+using namespace aengine;
+
 class AERenderUnit
 {
 protected:

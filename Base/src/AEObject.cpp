@@ -13,292 +13,184 @@
 #include "AEVectorMath.h"
 
 
-AEObject::AEObject(void):
-		type(_type),
-		translate(_translate),
-		rotate(_rotate),
-		scale(_scale),
-		children(_children),
-		parent(_parent),
-		bounding_sphere(_bounding_sphere)
+namespace aengine
 {
-	this->_parent=NULL;
-
-	this->SetTranslate(vec3f(0.0f,0.0f,0.0f));
-	this->SetRotate(vec3f(0.0f,0.0f,0.0f));
-	this->SetScale(vec3f(1.0f,1.0f,1.0f));
-
-	this->visible=true;
-	this->projection=AE_PERSPECTIVE;
-	this->_type=AE_OBJ_GENERIC;
-
-	this->mn_recalc =true;
-	this->tmn_recalc=true;
-	this->rmn_recalc=true;
-	this->smn_recalc=true;
-
-	this->cmn_recalc =true;
-	this->ctmn_recalc=true;
-	this->crmn_recalc=true;
-	this->csmn_recalc=true;
-
-	this->_bounding_sphere.radius=1.0f;
-	this->_bounding_sphere.color={1.0f,1.0f,1.0f,1.0f};
-
-	static int counter=0;
-	std::stringstream sstr;
-	sstr<<"unnamed_"<<counter++;
-	this->name=sstr.str();
-}
-
-void AEObject::AddChild(AEObject *child)
-{
-	child->_parent=this;
-	this->_children.push_back(child);
-}
-
-void AEObject::RemoveChild(AEObject *child)
-{
-	std::vector<AEObject*>::iterator b=this->_children.begin();
-	std::vector<AEObject*>::iterator e=this->_children.end();
-	do
+	AEObject::AEObject(void):
+			type(_type),
+			translate(_translate),
+			rotate(_rotate),
+			scale(_scale),
+			children(_children),
+			parent(_parent),
+			bounding_sphere(_bounding_sphere)
 	{
-		if(*b==child)
-		{
-			child->_parent=NULL;
-			//FIXME: we must either destroy this object or move to scene
-			throw 0;
-			this->_children.erase(b);
-			break;
-		}
-	}while(b++!=e);
-}
+		this->_parent=NULL;
 
-void AEObject::Move(AEVector3f vec)
-{
-	AEVector4f trans=this->GetMatrix()*vec4f(vec,0);
-	this->RelTranslate(vec3f(trans.X,trans.Y,trans.Z));
+		this->SetTranslate(vec3f(0.0f,0.0f,0.0f));
+		this->SetRotate(vec3f(0.0f,0.0f,0.0f));
+		this->SetScale(vec3f(1.0f,1.0f,1.0f));
 
-	InvalidateTranslate();
-}
+		this->visible=true;
+		this->projection=AE_PERSPECTIVE;
+		this->_type=AE_OBJ_GENERIC;
 
-void AEObject::RelTranslate(AEVector3f vec)
-{
-	this->_translate.X+=vec.X;
-	this->_translate.Y+=vec.Y;
-	this->_translate.Z+=vec.Z;
+		this->InvalidateTransform();
 
-	InvalidateTranslate();
-}
+		this->_bounding_sphere.radius=1.0f;
+		this->_bounding_sphere.color={1.0f,1.0f,1.0f,1.0f};
 
-void AEObject::SetTranslate(AEVector3f vec)
-{
-	this->_translate.X=vec.X;
-	this->_translate.Y=vec.Y;
-	this->_translate.Z=vec.Z;
-
-	InvalidateTranslate();
-}
-
-void AEObject::RelRotate(AEVector3f vec)
-{
-	this->_rotate.X+=vec.X;
-	this->_rotate.Y+=vec.Y;
-	this->_rotate.Z+=vec.Z;
-
-	InvalidateRotate();
-}
-
-void AEObject::SetRotate(AEVector3f vec)
-{
-	this->_rotate.X=vec.X;
-	this->_rotate.Y=vec.Y;
-	this->_rotate.Z=vec.Z;
-
-	InvalidateRotate();
-}
-
-void AEObject::RelScale(AEVector3f vec)
-{
-	this->_scale.X*=vec.X;
-	this->_scale.Y*=vec.Y;
-	this->_scale.Z*=vec.Z;
-
-	InvalidateScale();
-}
-
-void AEObject::SetScale(AEVector3f vec)
-{
-	this->_scale.X=vec.X;
-	this->_scale.Y=vec.Y;
-	this->_scale.Z=vec.Z;
-
-	InvalidateScale();
-}
-
-void AEObject::InvalidateTranslate(void)
-{
-	tmn_recalc=true;
-	ctmn_recalc=true;
-	mn_recalc=true;
-	cmn_recalc=true;
-}
-
-void AEObject::InvalidateRotate(void)
-{
-	rmn_recalc=true;
-	crmn_recalc=true;
-	mn_recalc=true;
-	cmn_recalc=true;
-}
-
-void AEObject::InvalidateScale(void)
-{
-	smn_recalc=true;
-	csmn_recalc=true;
-	mn_recalc=true;
-	cmn_recalc=true;
-}
-
-void AEObject::InvalidateTransform(void)
-{
-	mn_recalc=true;
-}
-
-void AEObject::CalculateMatrix(bool force)
-{
-	if(mn_recalc||force)
-	{
-		//calculate translate rotate and scale of object and w2c matrices
-		if(tmn_recalc||force)
-		{
-			tmatrix.SetIdentity();
-			tmatrix.Translate(this->translate);
-			tmn_recalc=false;
-		}
-
-		if(rmn_recalc||force)
-		{
-			//TODO: switch way to calculate rotation from object properties
-			rmatrix.SetIdentity();
-			rmatrix.RotateZYX(this->rotate);
-			rmn_recalc=false;
-		}
-
-		if(smn_recalc||force)
-		{
-			smatrix.SetIdentity();
-			smatrix.Scale(this->scale);
-			smn_recalc=false;
-		}
-
-		_matrix=tmatrix*rmatrix;
-		_matrix=_matrix*smatrix;
-
-		if(this->parent)
-			_wmatrix=this->parent->_wmatrix*_matrix;
-		else
-			_wmatrix=_matrix;
-
-		mn_recalc=false;
-
-		for(size_t q=0;q<this->_children.size();q++)
-		{
-			this->_children[q]->mn_recalc=true;
-			this->_children[q]->CalculateMatrix(force);
-		}
-	}
-}
-
-void AEObject::CalculateCameraMatrix(bool force)
-{
-	if(cmn_recalc)
-	{
-		if(ctmn_recalc)
-		{
-			ctmatrix.SetIdentity();
-			ctmatrix.Translate(-translate);
-			ctmn_recalc=false;
-		}
-
-		if(crmn_recalc)
-		{
-			crmatrix.SetIdentity();
-			crmatrix.RotateXYZ(-rotate);
-			crmn_recalc=false;
-		}
-
-		if(csmn_recalc)
-		{
-			csmatrix.SetIdentity();
-			csmatrix.Scale(1/scale.X,1/scale.Y,1/scale.Z);
-			csmn_recalc=false;
-		}
-
-		_wcmatrix=csmatrix*crmatrix;
-		_wcmatrix=_wcmatrix*ctmatrix;
-		if(this->parent)
-			_wcmatrix=_wcmatrix*this->parent->GetCameraMatrix();
-
-		cmn_recalc=false;
-
-		for(size_t q=0;q<this->_children.size();q++)
-		{
-			this->_children[q]->cmn_recalc=true;
-		}
-	}
-}
-
-const AEMatrix4f4 &AEObject::GetMatrix(void)
-{
-	this->CalculateMatrix();
-	return this->_matrix;
-}
-
-const AEMatrix4f4 &AEObject::GetWorldMatrix(void)
-{
-	this->CalculateMatrix();
-	return this->_wmatrix;
-}
-
-const AEMatrix4f4 &AEObject::GetCameraMatrix(void)
-{
-	this->CalculateCameraMatrix();
-	return this->_wcmatrix;
-}
-
-void AEObject::CalculateBoundingSphere(void)
-{
-	float max_rad=1.0f;
-
-	AEVector3f trans=this->GetAbsPosition();
-
-	for(AEObject *&child:this->_children)
-	{
-		child->CalculateBoundingSphere();
-		float cr=SqrLength(trans-child->GetAbsPosition())+child->bounding_sphere.radius;
-		if(cr>max_rad) max_rad=cr;
+		static int counter=0;
+		std::stringstream sstr;
+		sstr<<"unnamed_"<<counter++;
+		this->name=sstr.str();
 	}
 
-	this->_bounding_sphere.radius=sqrt(max_rad);
-}
+	void AEObject::AddChild(AEObject *child)
+	{
+		child->_parent=this;
+		this->_children.push_back(child);
+	}
 
-AEVector3f AEObject::GetAbsPosition(void)
-{
-	this->CalculateMatrix();
-	AEVector3f vec={_wmatrix[12],_wmatrix[13],_wmatrix[14]};
+	void AEObject::RemoveChild(AEObject *child)
+	{
+		std::vector<AEObject*>::iterator b=this->_children.begin();
+		std::vector<AEObject*>::iterator e=this->_children.end();
+		do
+		{
+			if(*b==child)
+			{
+				child->_parent=NULL;
+				//FIXME: we must either destroy this object or move to scene
+				throw 0;
+				this->_children.erase(b);
+				break;
+			}
+		}while(b++!=e);
+	}
 
-	return vec;
-}
+	void AEObject::Move(AEVector3f vec)
+	{
+		AEVector4f trans=this->GetMatrix()*vec4f(vec,0);
+		this->RelTranslate(vec3f(trans.X,trans.Y,trans.Z));
 
-AEVector3f AEObject::GetAbsScale(void)
-{
-	this->CalculateMatrix();
-	AEVector3f vec={_wmatrix[0],_wmatrix[5],_wmatrix[10]};
+		InvalidateTransform();
+	}
 
-	return vec;
-}
+	void AEObject::RelTranslate(AEVector3f vec)
+	{
+		this->_translate=this->translate+vec;
 
-AEObject::~AEObject(void)
-{
+		InvalidateTransform();
+	}
+
+	void AEObject::SetTranslate(AEVector3f vec)
+	{
+		this->_translate=vec;
+
+		InvalidateTransform();
+	}
+
+	void AEObject::RelRotate(AEVector3f vec)
+	{
+		this->_rotate=this->rotate+vec;
+
+		InvalidateTransform();
+	}
+
+	void AEObject::SetRotate(AEVector3f vec)
+	{
+		this->_rotate=vec;
+
+		InvalidateTransform();
+	}
+
+	void AEObject::RelScale(AEVector3f vec)
+	{
+		this->_scale=this->_scale*vec;
+
+		InvalidateTransform();
+	}
+
+	void AEObject::SetScale(AEVector3f vec)
+	{
+		this->_scale=vec;
+
+		InvalidateTransform();
+	}
+
+	void AEObject::InvalidateTransform(void)
+	{
+		mn_recalc=true;
+	}
+
+	void AEObject::CalculateMatrix(bool force)
+	{
+		if(mn_recalc||force)
+		{
+			_matrix=AEMatrix4f4().
+				Translate(this->translate).
+				RotateZ(this->rotate.Z).
+				RotateY(this->rotate.Y).
+				RotateX(this->rotate.X).
+				Scale(this->scale);
+
+			if(this->parent)
+				_wmatrix=this->parent->_wmatrix*_matrix;
+			else
+				_wmatrix=_matrix;
+
+			mn_recalc=false;
+
+			for(AEObject *child:this->_children)
+				child->InvalidateTransform();
+		}
+	}
+
+	const AEMatrix4f4 &AEObject::GetMatrix(void)
+	{
+		this->CalculateMatrix();
+		return this->_matrix;
+	}
+
+	const AEMatrix4f4 &AEObject::GetWorldMatrix(void)
+	{
+		this->CalculateMatrix();
+		return this->_wmatrix;
+	}
+
+	void AEObject::CalculateBoundingSphere(void)
+	{
+		float max_rad=1.0f;
+
+		AEVector3f trans=this->GetAbsPosition();
+
+		for(AEObject *&child:this->_children)
+		{
+			child->CalculateBoundingSphere();
+			float cr=SqrLength(trans-child->GetAbsPosition())+child->bounding_sphere.radius;
+			if(cr>max_rad) max_rad=cr;
+		}
+
+		this->_bounding_sphere.radius=sqrt(max_rad);
+	}
+
+	AEVector3f AEObject::GetAbsPosition(void)
+	{
+		this->CalculateMatrix();
+		AEVector3f vec={_wmatrix[12],_wmatrix[13],_wmatrix[14]};
+
+		return vec;
+	}
+
+	AEVector3f AEObject::GetAbsScale(void)
+	{
+		this->CalculateMatrix();
+		AEVector3f vec={_wmatrix[0],_wmatrix[5],_wmatrix[10]};
+
+		return vec;
+	}
+
+	AEObject::~AEObject(void)
+	{
+	}
 }
