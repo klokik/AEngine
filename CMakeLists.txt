@@ -55,3 +55,6 @@ target_link_libraries(${AE_BINARY_NAME} ${AE_LINK_COMPONENTS} ${ADDITIONAL_LIBRA
 include_directories(Project/Heaven)
 add_subdirectory(Project/Heaven)
 
+# Tests
+
+add_subdirectory(Tests)

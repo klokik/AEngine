@@ -12,51 +12,59 @@
 
 #include "AEUnits.h"
 
-class AEMatrix4f4
+
+namespace aengine
 {
-protected:
-	float ret_val[16];		//array which reference would be returned after multiplication and other operations
-	float data[16];
+	class AEMatrix4f4
+	{
+	protected:
+		float data[16];
 
-public:
-	AEMatrix4f4(void);
-	AEMatrix4f4(AEMatrix4f4 const &val);
-	AEMatrix4f4(float const val[16]);
+	public:
+		AEMatrix4f4(void);
+		AEMatrix4f4(AEMatrix4f4 const &val);
+		AEMatrix4f4(float const val[16]);
 
-	void SetIdentity(void);
+		void SetIdentity(void);
 
-	float &operator()(const size_t col,const size_t row);
-	float &operator[](const size_t id);
+		float &operator()(size_t col,size_t row);
+		float &operator[](size_t id);
 
-	AEMatrix4f4 &operator=(AEMatrix4f4 const &val);
-	AEMatrix4f4 &operator=(float const val[16]);
+		float operator()(size_t col,size_t row) const;
+		float operator[](size_t id) const;
 
-	int operator==(AEMatrix4f4 val);
+		AEMatrix4f4 &operator=(AEMatrix4f4 const &val);
+		AEMatrix4f4 &operator=(float const val[16]);
 
-	float *const operator*(float val);
-	float *const operator*(AEMatrix4f4 const &val);
-	float *const operator*(float const val[16]);
-	AEVector4f operator*(AEVector4f const &vec) const;
+		bool operator==(AEMatrix4f4 val);
 
-	float const *ToArray(void) const;
-	operator const float*() const;
+		friend AEMatrix4f4 operator*(AEMatrix4f4 const &mA,float val);
+		friend AEMatrix4f4 operator*(float val,AEMatrix4f4 const &mA);
+		friend AEMatrix4f4 operator*(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);
+		friend AEVector4f operator*(AEMatrix4f4 const &mA,AEVector4f vec);
 
-	void RotateX(float value);
-	void RotateY(float value);
-	void RotateZ(float value);
-	void RotateXYZ(AEVector3f const &vec);
-	void RotateZYX(AEVector3f const &vec);
+		friend AEMatrix4f4 operator+(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);
+		friend AEMatrix4f4 operator-(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);
 
-	void Translate(float x,float y,float z);
-	void Translate(AEVector3f const &vec);
-	//void TranslateWorld(float x,float y,float z);
+		AEMatrix4f4 operator-(void);
 
-	void Scale(float x,float y,float z);
-	void Scale(AEVector3f const &vec);
+		float const *ToArray(void) const;
+		operator const float*() const;
 
-	void Transpose(void);
+		AEMatrix4f4 RotateX(float value) const;
+		AEMatrix4f4 RotateY(float value) const;
+		AEMatrix4f4 RotateZ(float value) const;
 
-	virtual ~AEMatrix4f4(void);
-};
+		AEMatrix4f4 Translate(AEVector3f vec) const;
+		AEMatrix4f4 Scale(AEVector3f vec) const;
+
+		AEMatrix4f4 Transpose(void) const;
+
+		float Determinant(void) const;
+		float Adjunct(size_t col,size_t row) const;
+
+		AEMatrix4f4 Invert(void) const;
+	};
+}
 
 #endif /* AEMATRIX4F4_H_ */
