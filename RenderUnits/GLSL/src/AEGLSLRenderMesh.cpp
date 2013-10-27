@@ -19,27 +19,14 @@ namespace aengine
 		if(obj->mesh->IsInvalid())
 			AEGLRenderUnit::UpdateMeshBuffers(obj->mesh);
 
-		if(obj->material&&obj->material->shading)
-		{
-			p_3vmnl->Use();
-			p_3vmnl->BindData(
-					obj->GetWorldMatrix(),
-					obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
-					prjmatrix,
-					obj->mesh,
-					obj->material,
-					lighting_cache);
-		}
-		else
-		{
-			p_3vmn->Use();
-			p_3vmn->BindData(
-					obj->GetWorldMatrix(),
-					obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
-					prjmatrix,
-					obj->mesh,
-					obj->material);
-		}
+		p_3vmn->Use();
+		p_3vmn->BindData(
+				obj->GetWorldMatrix(),
+				obj->projection==AE_ORTHOGRAPHIC?identity:cammatrix,
+				prjmatrix,
+				obj->mesh,
+				obj->material);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,obj->mesh->idfce);
 
 		glDrawElements(GL_TRIANGLES,obj->mesh->fcecount*3,GL_UNSIGNED_INT,0);
@@ -51,9 +38,18 @@ namespace aengine
 
 	void AEGLSLRenderUnit::RenderMeshes(void)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);//fbo_gbuffer);
-		// GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2};
-		// glDrawBuffers(3,draw_bufs);
+		if(use_gbuffer)
+		{
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_gbuffer);
+			GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2};
+			glDrawBuffers(3,draw_bufs);
+		}
+		else
+		{
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fbo_onds);
+			GLenum draw_bufs[]={GL_COLOR_ATTACHMENT0};
+			glDrawBuffers(1,draw_bufs);
+		}
 
 		glEnable(GL_DEPTH_TEST);
 

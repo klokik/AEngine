@@ -47,7 +47,7 @@ namespace aengine
 
 				AERenderFactory rfactory;
 
-				this->render=rfactory.GetRenderUnit("GLES");
+				this->render=rfactory.GetRenderUnit("GLSL");
 				if(!this->render)
 				{
 					AEPrintLog("Incorrect RenderUnit");

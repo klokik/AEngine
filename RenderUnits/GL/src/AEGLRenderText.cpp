@@ -47,14 +47,14 @@ namespace aengine
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		float lambda=0;
-		switch(obj->alignment)
+		switch(obj->char_alignment)
 		{
 		case AE_CENTER: lambda=-0.5f; break;
 		case AE_LEFT: lambda=0.0f; break;
 		case AE_RIGHT: lambda=-1.0f; break;
 		}
 
-		AEVector3f shift=obj->spacing*obj->text.length()*lambda;
+		AEVector3f shift=obj->char_spacing*obj->text.length()*lambda;
 		glTranslatef(shift.X,shift.Y,shift.Z);
 
 		glBindTexture(GL_TEXTURE_2D,font->texture->id);
@@ -67,7 +67,7 @@ namespace aengine
 			glTranslatef(q%font->width,q/font->height,0.0f);
 			glDrawElements(GL_TRIANGLES,3*2,GL_UNSIGNED_INT,NULL);
 			glMatrixMode(GL_MODELVIEW);
-			glTranslatef(obj->spacing.X,obj->spacing.Y,obj->spacing.Z);
+			glTranslatef(obj->char_spacing.X,obj->char_spacing.Y,obj->char_spacing.Z);
 		}
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();

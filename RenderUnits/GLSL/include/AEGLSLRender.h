@@ -23,6 +23,8 @@ namespace aengine
 	{
 	protected:
 		bool use_MRT;	// use multiple render targets
+		bool use_gbuffer;
+		bool use_postprocessing;
 
 		AEGLSLProgramManager pmanager;
 
@@ -31,7 +33,7 @@ namespace aengine
 		AEGLSLProgram3vmn	*p_3vmn;
 		AEGLSLProgram3vmnl	*p_3vmnl;
 
-		AEGLSLProgram2vsquarelight *p_post_invert;
+		AEGLSLProgram2vsquarelight *p_post_combine_gbuffer;
 
 		//framebuffer object to render scene into it
 		// uint fbo_main;

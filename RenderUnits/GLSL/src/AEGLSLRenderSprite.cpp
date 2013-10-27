@@ -22,7 +22,7 @@ namespace aengine
 
 		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 
-		glDisable(GL_DEPTH_TEST);
+		// glDisable(GL_DEPTH_TEST);
 
 		p_3vm->Use();
 
@@ -95,7 +95,7 @@ namespace aengine
 
 		glBindFramebuffer(GL_FRAMEBUFFER,fbo_onds);
 
-		glDisable(GL_DEPTH_TEST);
+		// glDisable(GL_DEPTH_TEST);
 		glDisable(GL_STENCIL_TEST);
 
 		p_3vm->Use();

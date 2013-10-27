@@ -1,4 +1,4 @@
-#version 100
+#version 120
 
 uniform mat4 u_object_matrix;
 uniform mat4 u_camera_matrix;
@@ -20,7 +20,7 @@ void main(void)
 	gl_Position=u_projection_matrix*u_camera_matrix*pos;
 	
 	f_texcoord0=a_texcoord0;
-	f_normal=a_normal;//mat3x3(u_camera_matrix*u_object_matrix)*a_normal;
+	f_normal=normalize((u_camera_matrix*u_object_matrix*vec4(a_normal,0.0)).xyz);
 
 	f_pos = (u_camera_matrix*pos).xyz;
 }

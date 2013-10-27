@@ -17,8 +17,8 @@
 #define AEGLSL_PATH_3VMNL_V		"res/shader/pvertex/basic_v.glsl"
 #define AEGLSL_PATH_3VMNL_F		"res/shader/pvertex/basic_f.glsl"
 
-#define AEGLSL_PATH_POST_INVERT_V	"res/shader/square/basic_v.glsl"
-#define AEGLSL_PATH_POST_INVERT_F	"res/shader/square/basic_f.glsl"
+#define AEGLSL_PATH_POST_COMBINE_GBUFFER_V	"res/shader/square/basic_v.glsl"
+#define AEGLSL_PATH_POST_COMBINE_GBUFFER_F	"res/shader/square/basic_f.glsl"
 
 
 #endif /* AEGLSLFILEPATH_H_ */
