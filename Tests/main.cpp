@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <GL/gl.h>
+#include <SDL/SDL.h>
 
 #include <iostream>
 
@@ -20,14 +21,13 @@
 #include "AEObjectSprite.h"
 #include "AEObjectEmpty.h"
 #include "AEObjectText.h"
+#include "AEResourceManager.h"
 
 #include "AECOLLADALoader.h"
 
 using namespace aengine;
 
 //#include "AEMatrix4f4.h"
-
-void LoadObjFile(AEMesh *&mesh, const char *path);
 
 #define p_size 1
 
@@ -126,9 +126,12 @@ void StartInit(int *)
 	pobj=new AEObjectMesh;
 	sky=new AEObjectMesh;
 
-	LoadObjFile(pobj->mesh,"../resource/landskape_texmtn.obj");
+	pobj->mesh = new AEMesh;
+
+	AEResourceManager::LoadMeshObj("../resource/landskape_texmtn.obj",*pobj->mesh);
 	AEMesh *&tcube=sky->mesh;
-	LoadObjFile(tcube,"../resource/cube_flat.obj");//
+	tcube=new AEMesh;
+	AEResourceManager::LoadMeshObj("../resource/cube_flat.obj",*tcube);//
 
 	sol		=new AEObjectMesh; sol->	SetScale(vec3f(5.0f,5.0f,5.0f)); sol->	mesh=tcube;
 	mercury	=new AEObjectMesh; mercury->SetScale(vec3f(0.5f,0.5f,0.5f)); mercury->mesh=tcube;
@@ -158,7 +161,8 @@ void StartInit(int *)
 	sky->SetScale(vec3f(100.0f,100.0f,100.0f));
 
 	AEMaterial *mat=engine.scene->materials.New();
-	engine.scene->materials.LoadTexture(mat->texture,"../resource/grass.jpg");
+	mat->texture = new AETexture;
+	AEResourceManager::LoadImage("../resource/grass.png",*mat->texture,"png");
 	pobj->material=mat;
 
 	sky->material=engine.scene->materials.New();
@@ -175,7 +179,7 @@ void StartInit(int *)
 
 	otext=new AEObjectText;
 	otext->text="hello, world!";
-	otext->alignment=AE_LEFT;
+	otext->char_alignment=AE_LEFT;
 	otext->SetTranslate(vec3f(25.0f,25.0f,0.0f));
 
 	engine.scene->AddObject(plight1);

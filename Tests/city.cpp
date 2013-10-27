@@ -10,7 +10,9 @@
 #include <GL/gl.h>
 
 #include <iostream>
- #include <stdlib.h>
+#include <stdlib.h>
+
+#include <SDL/SDL.h>
 
 #include "AEEngine.h"
 
@@ -22,12 +24,13 @@
 #include "AEObjectSprite.h"
 #include "AEObjectEmpty.h"
 #include "AEObjectText.h"
+#include "AEResourceManager.h"
 
 #include "AECOLLADALoader.h"
 
 //#include "AEMatrix4f4.h"
 
-void LoadObjFile(AEMesh *&mesh, const char *path);
+using namespace aengine;
 
 #define p_size 100
 
@@ -100,8 +103,8 @@ void Refresh(int *param)
 
 void GenerateCity(void)
 {
-	AEMesh *tcube;
-	LoadObjFile(tcube,"../resource/cube_flat.obj");//
+	AEMesh *tcube=new AEMesh;
+	AEResourceManager::LoadMesh("../resource/cube_flat.obj",*tcube);//
 
 	ground = new AEObjectMesh;
 	ground->mesh = tcube;
@@ -173,7 +176,7 @@ void StartInit(int *)
 
 	otext = new AEObjectText;
 	otext->text="hello, world!";
-	otext->alignment=AE_LEFT;
+	otext->char_alignment=AE_LEFT;
 	otext->SetTranslate(vec3f(25.0f,260.0f,0.0f));
 
 	engine.scene->AddObject(plight1);
