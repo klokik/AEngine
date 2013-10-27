@@ -16,46 +16,49 @@
 #include "AEMesh.h"
 #include "AEObjectCamera.h"
 
- 
-class AECOLLADALoader
+
+namespace aengine
 {
-protected:
-	//Dae file
-	DAE dae;
+	class AECOLLADALoader
+	{
+	protected:
+		//Dae file
+		DAE dae;
 
-	//<COLLADA> root node
-	daeElement *root;
+		//<COLLADA> root node
+		daeElement *root;
 
-	daeElement *library_visual_scenes;
-	daeElement *library_geometries;
-	daeElement *library_materials;
-	daeElement *library_effects;
+		daeElement *library_visual_scenes;
+		daeElement *library_geometries;
+		daeElement *library_materials;
+		daeElement *library_effects;
 
-	AEScene *scene;
+		AEScene *scene;
 
-	int x_up,y_up,z_up;
+		int x_up,y_up,z_up;
 
-	void processVisualScenes(void);
-	void processSubNodes(daeElement *node_parent,AEObject *parent);
-	void processGeometries(void);
-	void processMaterials(void);
+		void processVisualScenes(void);
+		void processSubNodes(daeElement *node_parent,AEObject *parent);
+		void processGeometries(void);
+		void processMaterials(void);
 
-	AEMesh *processGeometry(daeElement *geometry);
-	AEMaterial *processMaterial(daeElement *material);
-	AEColor getColor(daeElement *ancestor,const char *property);
-	float getFloat(daeElement *ancestor,const char *property);
-	void processLight(daeElement *light,AEObjectLight *object);
-	void processCamera(daeElement *camera,AEObjectCamera *object);
+		AEMesh *processGeometry(daeElement *geometry);
+		AEMaterial *processMaterial(daeElement *material);
+		AEColor getColor(daeElement *ancestor,const char *property);
+		float getFloat(daeElement *ancestor,const char *property);
+		void processLight(daeElement *light,AEObjectLight *object);
+		void processCamera(daeElement *camera,AEObjectCamera *object);
 
-	int processInput(AEMesh *mesh,daeElement *input,
-			size_t *voffset,
-			size_t *noffset,
-			size_t *toffset);
+		int processInput(AEMesh *mesh,daeElement *input,
+				size_t *voffset,
+				size_t *noffset,
+				size_t *toffset);
 
-public:
-	AECOLLADALoader(void);
+	public:
+		AECOLLADALoader(void);
 
-	int Load(AEScene *_scene,const char *filename);
-};
+		int Load(AEScene *_scene,const char *filename);
+	};
+}
 
 #endif /* AECOLLADALOADER_H_ */
