@@ -151,6 +151,36 @@ AEVector4f operator /(const AEVector4f &a,const float b)
 	return {a.X/b,a.Y/b,a.Z/b,a.W/b};
 }
 
+bool operator==(const AEVector2f a,const AEVector2f b)
+{
+	return (a.X==b.X)&&(a.Y==b.Y);
+}
+
+bool operator==(const AEVector3f a,const AEVector3f b)
+{
+	return (a.X==b.X)&&(a.Y==b.Y)&&(a.Z==b.Z);
+}
+
+bool operator==(const AEVector4f a,const AEVector4f b)
+{
+	return (a.X==b.X)&&(a.Y==b.Y)&&(a.Z==b.Z)&&(a.W==b.W);
+}
+
+bool operator!=(const AEVector2f a,const AEVector2f b)
+{
+	return !(a==b);
+}
+
+bool operator!=(const AEVector3f a,const AEVector3f b)
+{
+	return !(a==b);
+}
+
+bool operator!=(const AEVector4f a,const AEVector4f b)
+{
+	return !(a==b);
+}
+
 float dot(const AEVector2f &a,const AEVector2f &b)
 {
 	return a.X*b.X+a.Y*b.Y;
