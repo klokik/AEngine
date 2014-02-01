@@ -32,6 +32,8 @@ float SqrLength(AEVector2f vec);
 float SqrLength(AEVector3f vec);
 float SqrLength(AEVector4f vec);
 
+AEVector3f flip(AEVector3f a,AEVector3f b);
+
 AEVector2f operator+(const AEVector2f &a,const AEVector2f &b);
 AEVector3f operator+(const AEVector3f &a,const AEVector3f &b);
 AEVector4f operator+(const AEVector4f &a,const AEVector4f &b);
@@ -59,6 +61,11 @@ bool operator==(const AEVector4f a,const AEVector4f b);
 bool operator!=(const AEVector2f a,const AEVector2f b);
 bool operator!=(const AEVector3f a,const AEVector3f b);
 bool operator!=(const AEVector4f a,const AEVector4f b);
+
+// collinearity
+bool operator||(const AEVector2f a,const AEVector2f b);
+bool operator||(const AEVector3f a,const AEVector3f b);
+bool operator||(const AEVector4f a,const AEVector4f b);
 
 float dot(const AEVector2f &a,const AEVector2f &b);
 float dot(const AEVector3f &a,const AEVector3f &b);

@@ -8,7 +8,10 @@
 #include <sstream>
 
 #include "AEVectorMath.h"
+#include "AEMatrix3f3.h"
 
+//used to compare floats for equality
+const float epsilon = 0.0001f;
 
 AEVector2f vec2f(float x,float y)
 {
@@ -73,6 +76,26 @@ float SqrLength(AEVector3f vec)
 float SqrLength(AEVector4f vec)
 {
 	return vec.X*vec.X+vec.Y*vec.Y+vec.Z*vec.Z+vec.W*vec.W;
+}
+
+AEVector3f flip(AEVector3f a,AEVector3f b)
+{
+	if(a||b)
+		return a;
+
+	AEVector3f c = cross(b,a);
+	AEVector3f d = cross(c,b);
+
+	float mtx[]={
+		b.X,b.Y,b.Z,
+		d.X,d.Y,d.Z,
+		c.X,c.Y,c.Z};
+
+	auto A = aengine::AEMatrix3f3(mtx);
+
+	auto result = A.Invert()*a*vec3f(0,-1.0f,0)*A;
+
+	return result;
 }
 
 AEVector2f operator +(const AEVector2f &a,const AEVector2f &b)
@@ -179,6 +202,24 @@ bool operator!=(const AEVector3f a,const AEVector3f b)
 bool operator!=(const AEVector4f a,const AEVector4f b)
 {
 	return !(a==b);
+}
+
+bool operator||(const AEVector2f a,const AEVector2f b)
+{
+	auto prod=dot(a,b);
+	return (SqrLength(a)*SqrLength(b)-prod*prod < epsilon);
+}
+
+bool operator||(const AEVector3f a,const AEVector3f b)
+{
+	auto prod=dot(a,b);
+	return (SqrLength(a)*SqrLength(b)-prod*prod < epsilon);
+}
+
+bool operator||(const AEVector4f a,const AEVector4f b)
+{
+	auto prod=dot(a,b);
+	return (SqrLength(a)*SqrLength(b)-prod*prod < epsilon);
 }
 
 float dot(const AEVector2f &a,const AEVector2f &b)
