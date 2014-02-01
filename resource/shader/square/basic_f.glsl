@@ -119,7 +119,7 @@ void main(void)
 	// }
 
 	vec3 light = vec3(1.0f);
-	// light = SetLighting();
+	light = SetLighting();
 	gl_FragData[0] = vec4(color.rgb*light*attenuation,1);
 	gl_FragDepth = pos.w;
 }
