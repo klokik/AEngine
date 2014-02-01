@@ -172,7 +172,6 @@ namespace aengine
 	{
 		if(mesh==nullptr) return AE_FALSE;
 		char buf[128];
-		sprintf(buf,"\t mesh present %d",mesh);
 		AEPrintLog(buf);
 		if(mesh->cached) return AE_TRUE;
 
