@@ -42,6 +42,7 @@ namespace aengine
 		friend AEMatrix4f4 operator*(float val,AEMatrix4f4 const &mA);
 		friend AEMatrix4f4 operator*(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);
 		friend AEVector4f operator*(AEMatrix4f4 const &mA,AEVector4f vec);
+		friend AEVector4f operator*(AEVector4f vec,AEMatrix4f4 const &mA);
 
 		friend AEMatrix4f4 operator+(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);
 		friend AEMatrix4f4 operator-(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB);

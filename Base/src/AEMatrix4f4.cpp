@@ -131,6 +131,19 @@ namespace aengine
 		return res;
 	}
 
+	AEVector4f operator*(AEVector4f vec,AEMatrix4f4 const &mA)
+	{
+		AEVector4f res;
+		const float *a=mA.data;
+
+		res.X=a[ 0]*vec.X+a[ 1]*vec.Y+a[ 2]*vec.Z+a[ 3]*vec.W;
+		res.Y=a[ 4]*vec.X+a[ 5]*vec.Y+a[ 6]*vec.Z+a[ 7]*vec.W;
+		res.Z=a[ 8]*vec.X+a[ 9]*vec.Y+a[10]*vec.Z+a[11]*vec.W;
+		res.W=a[12]*vec.X+a[13]*vec.Y+a[14]*vec.Z+a[15]*vec.W;
+
+		return res;
+	}
+
 	AEMatrix4f4 operator+(AEMatrix4f4 const &mA,AEMatrix4f4 const &mB)
 	{
 		const float *a=mA.data;
