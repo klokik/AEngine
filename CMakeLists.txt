@@ -21,7 +21,7 @@ set(INCLUDES "Tests" CACHE INTERNAL "" FORCE)
 set(AE_LINK_COMPONENTS "" CACHE INTERNAL "" FORCE)
 
 #set additional libraries to be linked with
-set(ADDITIONAL_LIBRARIES "" CACHE INTERNAL "" FORCE)
+set(ADDITIONAL_LIBRARIES "pthread" CACHE INTERNAL "" FORCE)
 
 include(includes.cmake)
 include_directories(${INCLUDES})
