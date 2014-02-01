@@ -76,6 +76,7 @@ namespace aengine
 
 		virtual void RenderEmpty(AEObject * obj);
 		virtual void RenderMesh(AEObjectMesh * obj);
+		virtual void RenderParticleSystem(AEObjectParticleSystem *psystem);
 
 		virtual void RenderText(AEObjectText *obj) override;
 

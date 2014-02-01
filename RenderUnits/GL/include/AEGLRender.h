@@ -79,6 +79,8 @@ namespace aengine
 		virtual void RenderMesh(AEObjectMesh * obj);
 		virtual void RenderJoint(AEObjectJoint * obj);
 
+		virtual void RenderParticleSystem(AEObjectParticleSystem *psystem);
+
 		virtual void RenderText(AEObjectText *obj);
 
 		virtual void RenderSpritesPersp(void);
@@ -89,6 +91,7 @@ namespace aengine
 		virtual void RenderMeshes(void);
 		virtual void RenderEmpties(void);
 		virtual void RenderJoints(void);
+		virtual void RenderParticles(void);
 		virtual void RenderTexts(void);
 
 		///returns "true" if object is textured, and "false" in the other case
