@@ -14,6 +14,8 @@
 #include "AEObjectSprite.h"
 #include "AEObjectJoint.h"
 #include "AEObjectText.h"
+#include "AEObjectParticleSystem.h"
+
 
 namespace aengine
 {
@@ -23,6 +25,7 @@ namespace aengine
 		std::vector<AEObject*> meshes;
 		std::vector<AEObject*> empties;
 		std::vector<AEObjectJoint*> joints;
+		std::vector<AEObjectParticleSystem*> particle_systems;
 
 
 		std::vector<AEObjectSprite*> sprites_persp;
@@ -35,6 +38,7 @@ namespace aengine
 			meshes.clear();
 			empties.clear();
 			joints.clear();
+			particle_systems.clear();
 			sprites_persp.clear();
 			sprites_ortho.clear();
 			texts.clear();

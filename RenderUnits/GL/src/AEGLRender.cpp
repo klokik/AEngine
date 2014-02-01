@@ -121,8 +121,9 @@ namespace aengine
 		case AE_OBJ_JOINT:
 			this->type_cache.joints.push_back(static_cast<AEObjectJoint*>(obj));
 			break;
-		// case AE_OBJ_CAMERA:
-		// 	break;
+		case AE_OBJ_PARTICLE_SYSTEM:
+			this->type_cache.particle_systems.push_back(static_cast<AEObjectParticleSystem*>(obj));
+			break;
 		default:
 			this->type_cache.empties.push_back(obj);
 			//render empty for debug purposes
@@ -184,9 +185,12 @@ namespace aengine
 
 		this->RenderMeshes();
 		CheckError();
-		// this->RenderEmpties();
+		this->RenderEmpties();
 		CheckError();
 		this->RenderJoints();
+		CheckError();
+
+		this->RenderParticles();
 		CheckError();
 
 		this->RenderSpritesPersp();
