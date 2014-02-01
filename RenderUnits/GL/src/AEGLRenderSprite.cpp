@@ -105,7 +105,7 @@ namespace aengine
 #else
 namespace aengine
 {
-	void AEGLRenderUnit::RenderSpritesPersp(void) {};
-	void AEGLRenderUnit::RenderSpritesOrtho(void) {};
+	void AEGLRenderUnit::RenderSpritesPersp(void) {}
+	void AEGLRenderUnit::RenderSpritesOrtho(void) {}
 }
 #endif /* !AE_NEW_GL_CONTEXT */

@@ -79,9 +79,9 @@ namespace aengine
 		glEnd();
 	}
 #else
-	void AEGLRenderUnit::RenderEmpty(AEObject * obj) {};
-	void AEGLRenderUnit::RenderBoundingSphere(AEObject * obj) {};
-	void AEGLRenderUnit::RenderJoint(AEObjectJoint * obj) {};
+	void AEGLRenderUnit::RenderEmpty(AEObject * obj) {}
+	void AEGLRenderUnit::RenderBoundingSphere(AEObject * obj) {}
+	void AEGLRenderUnit::RenderJoint(AEObjectJoint * obj) {}
 #endif /* !AE_NEW_GL_CONTEXT */
 
 	void AEGLRenderUnit::RenderEmpties(void)

@@ -56,7 +56,7 @@ namespace aengine
 			//TODO: Far not the best solution
 			// <hell>
 			AEMatrix4f4 A=cammatrix*obj->GetWorldMatrix();
-			Vec3f scale= obj->GetAbsScale();
+			Vec3f scale=obj->GetAbsScale();
 			A[0]=scale.X;
 			A[5]=scale.Y;
 			A[10]=scale.Z;
