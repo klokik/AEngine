@@ -14,4 +14,9 @@ namespace aengine
 	{
 		this->_type=AE_OBJ_EMPTY;
 	}
+
+	AEObjectDynamicEmpty::AEObjectDynamicEmpty()
+	{
+		this->_type=AE_OBJ_DYNEMPTY;
+	}
 }

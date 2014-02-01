@@ -101,6 +101,7 @@ namespace aengine
 		switch(obj->type)
 		{
 		case AE_OBJ_EMPTY:
+		case AE_OBJ_DYNEMPTY:
 			this->type_cache.empties.push_back(obj);
 			break;
 		case AE_OBJ_MESH:

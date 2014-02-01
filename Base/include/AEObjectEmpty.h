@@ -18,6 +18,12 @@ namespace aengine
 	public:
 		AEObjectEmpty();
 	};
+
+	class AEObjectDynamicEmpty: public virtual AEObject
+	{
+	public:
+		AEObjectDynamicEmpty();
+	};
 }
 
 #endif /* AEOBJECTEMPTY_H_ */

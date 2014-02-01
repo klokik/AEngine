@@ -42,6 +42,7 @@ typedef void  (*AE_EVENT)(int *);
 #define AE_OBJ_TYPE			AE_TYPE
 #define AE_OBJ_GENERIC		0x0000
 #define AE_OBJ_EMPTY		0x0001
+#define AE_OBJ_DYNEMPTY		0x0011
 #define AE_OBJ_MESH			0x0002
 #define AE_OBJ_SURFACE		0x0003
 #define AE_OBJ_LIGHT		0x0004
