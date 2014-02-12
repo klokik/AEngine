@@ -29,7 +29,7 @@ namespace aengine
 		AEMatrix4f4 mtx=cammatrix*psystem->GetWorldMatrix();
 		for(auto item:psystem->particles)
 		{
-			glLoadMatrixf(mtx*AEMatrix4f4().Translate(item.position).Scale(vec3f(0.1f,0.1f,0.1f)));
+			glLoadMatrixf(mtx*AEMatrix4f4().Translate(item.second.translate).Scale(vec3f(0.1f,0.1f,0.1f)));
 			glDrawArrays(GL_LINES,0,6);
 		}
 

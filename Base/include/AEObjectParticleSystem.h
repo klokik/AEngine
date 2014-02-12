@@ -27,21 +27,21 @@ namespace aengine
 	class AEParticle
 	{
 	public:
-		Vec3f position;
+		Vec3f translate;
 		Vec3f velocity;
 		Vec3f size;
 		float life;			// in seconds
 
 		AEParticle():
-			position(vec3f(0,0,0)),
+			translate(vec3f(0,0,0)),
 			velocity(vec3f(0,0,0)),
 			size(vec3f(.1f,.1f,.1f)),
 			life(0)
 		{
 		}
 
-		AEParticle(Vec3f position,Vec3f velocity,Vec3f size,float life):
-			position(position),velocity(velocity),size(size),life(life)
+		AEParticle(Vec3f translate,Vec3f velocity,Vec3f size,float life):
+			translate(translate),velocity(velocity),size(size),life(life)
 		{
 		}
 	};
@@ -53,13 +53,16 @@ namespace aengine
 		float initial_velocity;
 		Vec3f direction;
 		Vec3f grouping;
+		Vec3f translate;
+		Vec3f particle_size;
 
 		std::random_device rnd_dev;
 		std::mt19937 rgn;
 
 		AEParticleEmitter():
 			intensity(100.0f),initial_velocity(1),
-			direction(vec3f(1.0f,0.0f,0.0f)),grouping(vec3f(0.0f,0.0f,0.0f)),
+			direction(vec3f(0.0f,1.0f,0.0f)),grouping(vec3f(1.0f,0.0f,0.0f)),
+			translate(vec3f(0,0,0)),particle_size(vec3f(0.5f,0.5f,0.5f)),
 			rgn(rnd_dev())
 		{
 		}
@@ -71,13 +74,16 @@ namespace aengine
 	{
 	public:
 		// "true" if patricle survives, "false" if particle should die
-		virtual bool Affect(AEParticle &particle,float dt_ms) = 0;
+		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms) = 0;
+
+		enum class EventType {NEW_PARTICLE,PARTICLE_DIED};
+		virtual void Notify(EventType event,AEParticle &particle,size_t pt_id) {};
 	};
 
 	class AEParticleAffectorMove: public AEParticleAffector
 	{
 	public:
-		virtual bool Affect(AEParticle &particle,float dt_ms);
+		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms);
 	};
 
 	class AEParticleAffectorGravity: public AEParticleAffector
@@ -91,17 +97,37 @@ namespace aengine
 		}
 
 		AEParticleAffectorGravity(float _accel):
-			accel(vec3f(.0f,.0f,-_accel))
+			accel(vec3f(.0f,-_accel,.0f))
 		{
 		}
 
-		virtual bool Affect(AEParticle &particle,float dt_ms);
+		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms);
+	};
+
+	class AEParticleAffectorLifetime: public AEParticleAffector
+	{
+	private:
+		std::map<size_t,float> attributes;
+
+	public:
+		float max_time;
+		float range;
+
+		AEParticleAffectorLifetime(float time,float range):
+			max_time(time),range(range)
+		{	
+		}
+
+		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms);
+
+		virtual void Notify(EventType event,AEParticle &particle,size_t pt_id);
 	};
 
 	class AEObjectParticleSystem: public AEObject
 	{
 	public:
-		std::vector<AEParticle> particles;
+		std::map<size_t,AEParticle> particles;
+		size_t nonce;
 		AEParticleEmitter emitter;
 		std::vector<std::shared_ptr<AEParticleAffector> > affectors;
 

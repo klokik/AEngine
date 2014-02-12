@@ -5,7 +5,10 @@
  *      Author: klokik
  */
 
+#include <stdexcept>
+
 #include "AEObjectParticleSystem.h"
+#include "AEDebug.h"
 
 
 namespace aengine
@@ -14,15 +17,22 @@ namespace aengine
 	{
 		AEParticle item;
 
-		item.velocity=normalize(vec3f(	std::generate_canonical<float,10>(rgn)-0.5f,
-										std::generate_canonical<float,10>(rgn)-0.5f,
-										std::generate_canonical<float,10>(rgn)-0.5f))*initial_velocity;
+		auto rv2=vec2f(
+			std::generate_canonical<float,10>(rgn),
+			std::generate_canonical<float,10>(rgn))*2-vec2f(1,1);
+
+		auto rand_vec=grouping*rv2.X + cross(grouping,direction)*rv2.Y;
+
+		item.velocity=normalize(direction+rand_vec)*initial_velocity;
+
+		item.translate=translate;
+		item.size=particle_size;
 
 		return item;
 	}
 
 	AEObjectParticleSystem::AEObjectParticleSystem(void):
-		material(nullptr),life_period(5)
+		nonce(0),material(nullptr),life_period(5)
 	{
 		_type=AE_OBJ_PARTICLE_SYSTEM;
 		affectors.push_back(std::make_shared<AEParticleAffectorMove>());
@@ -31,22 +41,25 @@ namespace aengine
 	void AEObjectParticleSystem::Update(float dt_ms)
 	{
 		//particles.push_back(emitter.GetParticle());
+		std::vector<size_t> to_erase;
 
 		for(auto &affector:affectors)
 		{
-			for(AEParticle &item:particles)
+			size_t i=0;
+			for(auto &item:particles)
 			{
-				if(!affector->Affect(item,dt_ms));
-					//destroy particle
-
-				// item.life+=dt_ms*0.001f;
-				// if(item.life>=life_period)
-				// {
-				// 	// Destroy
-				// 	item.position=vec3f(0,0,0);
-				// 	item.life=0;
-				// }
+				if(!affector->Affect(item.second,item.first,dt_ms))
+					to_erase.push_back(item.first);
+				i++;
 			}
+		}
+
+		for(auto item:to_erase)
+		{
+			for(auto &affector:affectors)
+				affector->Notify(AEParticleAffector::EventType::PARTICLE_DIED,particles[item],item);
+
+			particles.erase(item);
 		}
 	}
 
@@ -58,20 +71,58 @@ namespace aengine
 	void AEObjectParticleSystem::EmitNum(size_t amount)
 	{
 		for(size_t q=0;q<amount;q++)
-			particles.push_back(emitter.GetParticle());
+		{
+			auto particle=emitter.GetParticle();
+			particles.emplace(nonce,particle);
+			for(auto &affector:affectors)
+				affector->Notify(AEParticleAffector::EventType::NEW_PARTICLE,particle,nonce);
+			nonce++;
+		}
 	}
 
-	bool AEParticleAffectorMove::Affect(AEParticle &particle,float dt_ms)
+	bool AEParticleAffectorMove::Affect(AEParticle &particle,size_t pt_id,float dt_ms)
 	{
-		particle.position=particle.position+particle.velocity*dt_ms*0.001f;
+		particle.translate=particle.translate+particle.velocity*dt_ms*0.001f;
 
 		return true;
 	}
 
-	bool AEParticleAffectorGravity::Affect(AEParticle &particle,float dt_ms)
+	bool AEParticleAffectorGravity::Affect(AEParticle &particle,size_t pt_id,float dt_ms)
 	{
 		particle.velocity=particle.velocity+accel*dt_ms*0.001f;
 
 		return true;
+	}
+
+	bool AEParticleAffectorLifetime::Affect(AEParticle &particle,size_t pt_id,float dt_ms)
+	{
+		try
+		{
+			auto &lifetime = attributes.at(pt_id);
+
+			lifetime+=dt_ms*0.001f;
+
+			if(lifetime>max_time)
+				return false;
+			return true;
+		}
+		catch(const std::out_of_range &ex)
+		{
+			dbgout()<<"I don't know about this particle O_o: "<<pt_id<<"\n\tHere is a fuck for u";
+			throw (new std::runtime_error("e====3"));
+		}
+	}
+
+	void AEParticleAffectorLifetime::Notify(EventType event,AEParticle &particle,size_t pt_id)
+	{
+		switch(event)
+		{
+		case EventType::NEW_PARTICLE:
+			attributes.emplace(pt_id,0.f);
+			break;
+		case EventType::PARTICLE_DIED:
+			attributes.erase(pt_id);
+			break;
+		}
 	}
 }

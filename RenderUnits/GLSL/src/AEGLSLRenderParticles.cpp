@@ -33,7 +33,7 @@ namespace aengine
 		for(auto item:psystem->particles)
 		{
 			glUniformMatrix4fv(p_3vm->u_object_matrix.id,1,false,
-				psystem->GetWorldMatrix().Translate(item.position).Scale(item.size));
+				psystem->GetWorldMatrix().Translate(item.second.translate).Scale(item.second.size));
 			glDrawElements(GL_TRIANGLES,2*3,GL_UNSIGNED_INT,NULL);
 		}
 
