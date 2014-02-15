@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <random>
+#include <functional>
 
 #include "AEObject.h"
 #include "AEMaterial.h"
@@ -30,18 +31,20 @@ namespace aengine
 		Vec3f translate;
 		Vec3f velocity;
 		Vec3f size;
-		float life;			// in seconds
+		AEColor color;
+		float time;			// life in seconds
 
 		AEParticle():
 			translate(vec3f(0,0,0)),
 			velocity(vec3f(0,0,0)),
 			size(vec3f(.1f,.1f,.1f)),
-			life(0)
+			time(0)
 		{
+			color.vec=vec4f(1.f,1.f,1.f,1.f);
 		}
 
-		AEParticle(Vec3f translate,Vec3f velocity,Vec3f size,float life):
-			translate(translate),velocity(velocity),size(size),life(life)
+		AEParticle(Vec3f translate,Vec3f velocity,Vec3f size,float life=0):
+			translate(translate),velocity(velocity),size(size),time(life)
 		{
 		}
 	};
@@ -106,9 +109,6 @@ namespace aengine
 
 	class AEParticleAffectorLifetime: public AEParticleAffector
 	{
-	private:
-		std::map<size_t,float> attributes;
-
 	public:
 		float max_time;
 		float range;
@@ -119,8 +119,22 @@ namespace aengine
 		}
 
 		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms);
+	};
 
-		virtual void Notify(EventType event,AEParticle &particle,size_t pt_id);
+	class AEParticleAffectorFunctional: public AEParticleAffector
+	{
+	public:
+		std::function<bool(AEParticle &particle,size_t pt_id,float dt_ms)> func;
+
+		AEParticleAffectorFunctional(std::function<bool(AEParticle &particle,size_t pt_id,float dt_ms)> func):
+			func(func)
+		{
+		}
+
+		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms)
+		{
+			return func(particle,pt_id,dt_ms);
+		}
 	};
 
 	class AEObjectParticleSystem: public AEObject

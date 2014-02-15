@@ -96,33 +96,12 @@ namespace aengine
 
 	bool AEParticleAffectorLifetime::Affect(AEParticle &particle,size_t pt_id,float dt_ms)
 	{
-		try
-		{
-			auto &lifetime = attributes.at(pt_id);
+		auto &lifetime = particle.time;
 
-			lifetime+=dt_ms*0.001f;
+		lifetime+=dt_ms*0.001f;
 
-			if(lifetime>max_time)
-				return false;
-			return true;
-		}
-		catch(const std::out_of_range &ex)
-		{
-			dbgout()<<"I don't know about this particle O_o: "<<pt_id<<"\n\tHere is a fuck for u";
-			throw (new std::runtime_error("e====3"));
-		}
-	}
-
-	void AEParticleAffectorLifetime::Notify(EventType event,AEParticle &particle,size_t pt_id)
-	{
-		switch(event)
-		{
-		case EventType::NEW_PARTICLE:
-			attributes.emplace(pt_id,0.f);
-			break;
-		case EventType::PARTICLE_DIED:
-			attributes.erase(pt_id);
-			break;
-		}
+		if(lifetime>max_time)
+			return false;
+		return true;
 	}
 }
