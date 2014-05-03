@@ -83,7 +83,7 @@ namespace aengine
 		}
 	};
 
-	typedef std::shared_ptr<_AEGLBuffer> AEGLBuffer;
+	using AEGLBuffer=std::shared_ptr<_AEGLBuffer>;
 }
 
 // class  AEGLSLFilter: public AEGLBuffer
