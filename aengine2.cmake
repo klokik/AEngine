@@ -12,8 +12,7 @@ add_definitions(-Wall)
 option(BUILD_EXECUTABLE "Build either executable binary or shared lib." ON)
 set(BUILD_EXECUTABLE ${BUILD_EXECUTABLE} CACHE INTERNAL "")
 
-option(TARGET_PLATFORM "Platform where application would be runned." "xNIX")
-set(TARGET_PLATFORM ${TARGET_PLATFORM} CACHE INTERNAL "" FORCE)
+set(TARGET_PLATFORM "xNIX" CACHE STRING "Platform where application would be runned.")
 
 set(AE_BINARY_NAME aengine)
 

@@ -17,7 +17,7 @@ elseif(TARGET_PLATFORM STREQUAL "Android")
 #	set(GLES_LIB GLESv3)
 	set(GLES_LIB GLESv2)
 else()
-	message(SEND_ERROR "Unknown platform, trying to use GLESv2")
+	message(WARNING "Unknown platform, going on with GLESv2")
 	set(GLES_LIB GLESv2)
 endif()
 
