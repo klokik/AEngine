@@ -80,6 +80,18 @@ namespace aengine
 		}
 	}
 
+	void AEObjectParticleSystem::EmitNum(size_t amount,std::vector<void*> ex)
+	{
+		for(size_t q=0;q<amount;q++)
+		{
+			auto particle=emitter.GetParticle();
+			particles.emplace(nonce,particle);
+			for(auto &affector:affectors)
+				affector->Notify(AEParticleAffector::EventType::NEW_PARTICLE,particle,nonce,ex[q]);
+			nonce++;
+		}
+	}
+
 	bool AEParticleAffectorMove::Affect(AEParticle &particle,size_t pt_id,float dt_ms)
 	{
 		particle.translate=particle.translate+particle.velocity*dt_ms*0.001f;

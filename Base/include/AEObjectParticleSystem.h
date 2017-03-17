@@ -80,7 +80,7 @@ namespace aengine
 		virtual bool Affect(AEParticle &particle,size_t pt_id,float dt_ms) = 0;
 
 		enum class EventType {NEW_PARTICLE,PARTICLE_DIED};
-		virtual void Notify(EventType event,AEParticle &particle,size_t pt_id) {};
+		virtual void Notify(EventType event,AEParticle &particle,size_t pt_id,void *ex=nullptr) {};
 	};
 
 	class AEParticleAffectorMove: public AEParticleAffector
@@ -158,6 +158,8 @@ namespace aengine
 
 		// Emit specified amount
 		void EmitNum(size_t amount);
+		// Same as previous but with extra data provided to affectors
+		void EmitNum(size_t amount,std::vector<void*> ex);
 	};
 }
 
